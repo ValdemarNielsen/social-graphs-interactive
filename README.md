@@ -86,9 +86,9 @@ src/content-language.ts      Weeks 4–6 learning content
 src/HeroExperience.tsx       Original Spider-Man SVG and connected-type interaction
 src/ChapterCover.tsx         Six chapter-specific cover compositions
 src/GlassSculpture.tsx       Custom WebGL raymarching sculpture and fallback
-src/MatterSculpture.tsx      Chrome mechanism and iridescent liquid raymarching
-src/ParticleTheatre.tsx      Projected filament, transit and typography scenes
-src/Visuals.tsx              Six GSAP/SVG scroll stories and diagram previews
+src/MatterSculpture.tsx      Machined aperture and folded-paper raymarching
+src/ParticleTheatre.tsx      Continuous filaments, route corridor and printed ribbons
+src/Visuals.tsx              Six GSAP/SVG visible-playback stories and diagram previews
 src/ChapterInterlude.tsx     Twelve distinct interactive teaching episodes
 src/ChapterJourney.tsx       Scene index, split study notes, lazy sequence boundaries
 src/NetworkChoreography.tsx  Six additional network mechanisms within/beyond notes

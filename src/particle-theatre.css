@@ -4,3 +4,10 @@
 @media(forced-colors:active){.particle-theatre canvas{display:none}.particle-theatre .pt-fallback{display:flex;color:CanvasText;text-shadow:none}.pt-caption,.pt-pointer-cue{color:CanvasText}}
 .particle-theatre-3 canvas{mask-image:radial-gradient(ellipse at 66% 47%,#000 48%,#000c 69%,transparent 94%)}
 @media(max-width:760px){.particle-theatre-3 canvas{mask-image:radial-gradient(ellipse at 50% 47%,#000 46%,#000c 66%,transparent 89%)}}
+.particle-theatre{--pt-ink:#46576a;--pt-line:#46576a2b;--pt-signal:#8e5b4c}
+.particle-theatre-3{--pt-ink:#c4bdce;--pt-line:#c4bdce2d;--pt-signal:#d5d4b6}
+.particle-theatre-5{--pt-ink:#334d81;--pt-line:#334d812b;--pt-signal:#8e5b4c}
+.particle-theatre-5 canvas{mask-image:none}
+.particle-theatre .pt-caption{letter-spacing:.1em}
+.particle-theatre .pt-caption:before{background:linear-gradient(90deg,var(--pt-line),transparent 80%)}
+.particle-theatre .pt-pointer-cue{opacity:.65;letter-spacing:.08em}

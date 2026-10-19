@@ -76,16 +76,16 @@ function buildSequence(root: HTMLElement, name: SceneName) {
       .to(q('.lc-wall-rig'), { rotationX: 0, rotationY: 0, rotationZ: 0, duration: 1.1 }, 3.25)
       .to(q('.lc-wall-rule'), { scaleX: 1, duration: .8, stagger: .1 }, 3.65);
   } else if (name === 'lens') {
-    gsap.set(q('.lc-lens-rig'), { rotationY: -12, rotationX: 7, rotationZ: -2 });
+    gsap.set(q('.lc-lens-rig'), { rotationY: -9, rotationX: 4, rotationZ: -1 });
     gsap.set(q('.lc-lens-slat'), { rotationY: 0, transformOrigin: '50% 50%' });
     gsap.set(q('.lc-lens-shine'), { xPercent: -130, opacity: 0 });
     gsap.set(q('.lc-finance-label'), { opacity: 0, y: 12 });
-    timeline.to(q('.lc-lens-rig'), { rotationY: 13, rotationX: -3, duration: 2 }, .2)
-      .to(q('.lc-lens-slat'), { rotationY: 180, duration: 1.6, stagger: .065, ease: 'power2.inOut' }, 1.4)
-      .to(q('.lc-river-label'), { opacity: 0, y: -12, duration: .5 }, 2)
-      .to(q('.lc-lens-shine'), { xPercent: 130, opacity: .7, duration: 2.3, ease: 'none' }, 1.65)
-      .to(q('.lc-lens-shine'), { opacity: 0, duration: .5 }, 3.8)
-      .to(q('.lc-finance-label'), { opacity: 1, y: 0, duration: .6 }, 3.45)
+    timeline.to(q('.lc-lens-rig'), { rotationY: 9, rotationX: -2, duration: 2 }, .05)
+      .to(q('.lc-lens-slat'), { rotationY: 180, duration: 2.1, stagger: .055, ease: 'power2.inOut' }, .15)
+      .to(q('.lc-river-label'), { opacity: 0, y: -8, duration: .5 }, 1.1)
+      .to(q('.lc-lens-shine'), { xPercent: 130, opacity: .35, duration: 2.8, ease: 'none' }, .45)
+      .to(q('.lc-lens-shine'), { opacity: 0, duration: .5 }, 3)
+      .to(q('.lc-finance-label'), { opacity: 1, y: 0, duration: .7 }, 2.55)
       .to(q('.lc-lens-rig'), { rotationY: 0, rotationX: 0, rotationZ: 0, duration: 1.1 }, 3.65);
   } else {
     gsap.set(q('.lc-book-rig'), { rotationX: 15, rotationZ: -4, y: 8, scale: .88 });
@@ -169,10 +169,25 @@ function TypeWall({ id }: { id: string }) {
 }
 
 function LensPicture({ finance }: { finance: boolean }) {
-  return <svg viewBox="0 0 1080 380" preserveAspectRatio="none" aria-hidden="true"><rect width="1080" height="380" fill={finance ? '#c8bbf2' : '#94b2bb'} />{finance ? <g>{Array.from({ length: 14 }, (_, i) => <rect key={i} x={i * 86 - 20} y={220 - (i % 4) * 28} width="50" height={190 + (i % 4) * 28} fill={i % 2 ? '#3b2d6b' : '#64548e'} opacity=".55" />)}<path d="M50 300 180 255 293 278 398 198 540 213 679 156 794 175 920 91 1040 105" fill="none" stroke="#eee1bd" strokeWidth="5" /></g> : <g>{Array.from({ length: 9 }, (_, i) => <path key={i} d={`M-30 ${120 + i * 29}Q180 ${i * 26 + 30} 360 ${i * 27 + 136}T750 ${i * 29 + 80} 1120 ${i * 26 + 160}`} fill="none" stroke={i % 2 ? '#d7e6db' : '#385e72'} strokeWidth={i % 2 ? 6 : 12} opacity=".55" />)}</g>}<text x="540" y="226" textAnchor="middle" fill={finance ? '#21163f' : '#163c50'} fontFamily="Instrument Serif,serif" fontSize="240" letterSpacing="-12">bank</text><text x="540" y="333" textAnchor="middle" fill={finance ? '#21163f' : '#163c50'} fontFamily="Space Grotesk,sans-serif" fontSize="16" letterSpacing="5">{finance ? 'CREDIT / LOANS / DEPOSITS' : 'RIVER / SHORE / CURRENT'}</text></svg>;
+  const ink = finance ? '#e9e3d3' : '#24434a';
+  return <svg viewBox="0 0 1080 380" preserveAspectRatio="none" aria-hidden="true">
+    <rect width="1080" height="380" fill={finance ? '#263d4c' : '#e7e5da'} />
+    {finance ? <g fill="none" stroke="#c7b895" strokeWidth="1.2" opacity=".2">
+      <path d="M163 320H917M186 315V106L540 52 894 106V315M211 125H869" />
+      {[260, 410, 560, 710].map(x => <path key={x} d={`M${x} 142V299M${x + 87} 142V299M${x - 8} 299H${x + 95}M${x - 8} 142H${x + 95}`} />)}
+    </g> : <g fill="none" stroke="#5f8991">
+      <path d="M-70 245C170 70 245 385 532 204S860 100 1155 250" strokeWidth="48" opacity=".055" />
+      {[0, 1, 2, 3].map(i => <path key={i} d={`M-70 ${218 + i * 15}C170 ${43 + i * 15} 245 ${358 + i * 15} 532 ${177 + i * 15}S860 ${73 + i * 15} 1155 ${223 + i * 15}`} strokeWidth="1.2" opacity=".2" />)}
+    </g>}
+    <path d="M50 49H1030M50 338H1030" stroke={ink} strokeWidth=".7" opacity=".2" />
+    <text x="54" y="32" fill={ink} opacity=".65" fontFamily="Space Grotesk,sans-serif" fontSize="10" letterSpacing="3">A STUDY IN CONTEXT</text>
+    <text x="1026" y="32" textAnchor="end" fill={ink} opacity=".65" fontFamily="Space Grotesk,sans-serif" fontSize="10" letterSpacing="3">{finance ? 'II / FINANCE' : 'I / LANDSCAPE'}</text>
+    <text x="533" y="263" textAnchor="middle" fill={ink} fontFamily="Instrument Serif,serif" fontSize="268" letterSpacing="-12">bank</text>
+    <text x="540" y="316" textAnchor="middle" fill={ink} opacity=".75" fontFamily="Space Grotesk,sans-serif" fontSize="12" letterSpacing="4">{finance ? 'CREDIT  ·  LOANS  ·  DEPOSITS' : 'RIVER  ·  SHORE  ·  CURRENT'}</text>
+  </svg>;
 }
 function LenticularMeaning() {
-  return <div className="lc-lens-stage lc-mechanism"><div className="lc-lens-rig"><div className="lc-lens-slats">{Array.from({ length: 18 }, (_, i) => <div key={i} className="lc-lens-slat"><div className="lc-lens-face lc-lens-front"><div className="lc-lens-image" style={{ left: `${-i * 100}%` }}><LensPicture finance={false} /></div></div><div className="lc-lens-face lc-lens-back"><div className="lc-lens-image" style={{ left: `${-i * 100}%` }}><LensPicture finance /></div></div></div>)}</div><div className="lc-lens-shine" /></div><p className="lc-lens-caption lc-river-label">“They sat on the river bank.”</p><p className="lc-lens-caption lc-finance-label">“The bank approved the loan.”</p><div className="lc-lens-axis"><span>ONE SPELLING</span><i /><span>DIFFERENT CONTEXTS</span></div></div>;
+  return <div className="lc-lens-stage lc-mechanism"><div className="lc-optical-ground" /><div className="lc-lens-rig"><div className="lc-lens-frame" /><div className="lc-lens-slats">{Array.from({ length: 18 }, (_, i) => <div key={i} className="lc-lens-slat"><div className="lc-lens-face lc-lens-front"><div className="lc-lens-image" style={{ left: `${-i * 100}%` }}><LensPicture finance={false} /></div></div><div className="lc-lens-face lc-lens-back"><div className="lc-lens-image" style={{ left: `${-i * 100}%` }}><LensPicture finance /></div></div></div>)}</div><div className="lc-lens-shine" /></div><p className="lc-lens-caption lc-river-label">“They sat on the river bank.”</p><p className="lc-lens-caption lc-finance-label">“The bank approved the loan.”</p><div className="lc-lens-axis"><span>ONE SPELLING</span><i /><span>DIFFERENT CONTEXTS</span></div></div>;
 }
 
 const pages = [
@@ -183,7 +198,24 @@ const pages = [
   { title: 'Context', words: ['words keep company', 'meaning takes shape', 'read what surrounds'] },
 ];
 function DocumentBook() {
-  return <div className="lc-book-stage lc-mechanism"><div className="lc-book-shadow" /><div className="lc-book-rig"><div className="lc-book-spine" />{pages.map((page, i) => <div key={page.title} className={`lc-doc-leaf lc-doc-${i}`}><span className="lc-document-id">DOCUMENT 0{i + 1}</span><h4>{page.title}</h4><div className="lc-document-lines">{page.words.map(line => <p key={line}>{line}</p>)}</div><div className="lc-document-rules">{Array.from({ length: 6 }, (_, line) => <i key={line} style={{ width: `${70 + (line * 13 + i * 7) % 30}%` }} />)}</div><div className="lc-feature-strip"><span>A REPRESENTATION</span><div>{Array.from({ length: 12 }, (_, bar) => <i key={bar} style={{ height: `${16 + ((bar * 23 + i * 19) % 42)}px` }} />)}</div></div><span className="lc-page-number">{String(i + 1).padStart(2, '0')}</span></div>)}<div className="lc-book-cover"><span>FIELD LIBRARY / VOL. 06</span><strong>A corpus.<br />Many views.</strong><i>Open the collection.</i><div className="lc-cover-mark">↗</div></div><div className="lc-optical-scan"><span /></div></div><div className="lc-book-colophon"><span>KEEP THE DOCUMENT.</span><span>QUESTION THE REPRESENTATION.</span></div></div>;
+  return <div className="lc-book-stage lc-mechanism">
+    <div className="lc-book-shadow" />
+    <div className="lc-book-rig">
+      <div className="lc-book-spine" />
+      {pages.map((page, i) => <div key={page.title} className={`lc-doc-leaf lc-doc-${i}`}>
+        <span className="lc-document-id">FIELD NOTE / {String(i + 1).padStart(2, '0')}</span>
+        <span className="lc-document-running">LANGUAGE & MEANING</span>
+        <h4>{page.title}</h4>
+        <div className="lc-document-lines">{page.words.map(line => <p key={line}>{line}</p>)}</div>
+        <div className="lc-document-rules">{[100, 100, 62].map((width, line) => <i key={line} style={{ width: `${width}%` }} />)}</div>
+        <div className="lc-feature-strip"><span>A REPRESENTATION</span><div>{Array.from({ length: 12 }, (_, bar) => <i key={bar} style={{ height: `${12 + ((bar * 23 + i * 19) % 30)}px` }} />)}</div></div>
+        <span className="lc-page-number">{String(i + 1).padStart(2, '0')}</span>
+      </div>)}
+      <div className="lc-book-cover"><span>THE FIELD LIBRARY</span><span className="lc-cover-edition">VOLUME VI</span><strong>A corpus.<br />Many views.</strong><i>Notes on language<br />and representation.</i><div className="lc-cover-mark"><span>VI</span></div></div>
+      <div className="lc-optical-scan"><span /></div>
+    </div>
+    <div className="lc-book-colophon"><span>KEEP THE DOCUMENT.</span><span>QUESTION THE REPRESENTATION.</span></div>
+  </div>;
 }
 
 export default function LanguageChoreography({ week, variant, reduced }: Props) {

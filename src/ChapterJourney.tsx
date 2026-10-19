@@ -10,7 +10,7 @@ const sceneNames = [
   ['Living filaments', 'From people to patterns', 'Every link counts twice', 'A comic in three dimensions', 'A crowd becomes a distribution', 'Turn the matrix'],
   ['The probability engine', 'Order meets chance', 'The rich get more chances', 'Eight possible worlds', 'One world is not a baseline', 'The popularity conveyor'],
   ['Through the network', 'Three kinds of influence', 'A shortcut rewrites the journey', 'The departure board', 'Cut once. Divide everything', 'The bridge carries everyone'],
-  ['Liquid communities', 'The partition problem', 'Borders are a hypothesis', 'Unfold the territory', 'Weight needs a local scale', 'Weave the connections'],
+  ['Forms of belonging', 'The partition problem', 'Borders are a hypothesis', 'Unfold the territory', 'Weight needs a local scale', 'Weave the connections'],
   ['Words become matter', 'From text to counts', 'Cut a sentence into pieces', 'Inside the printing press', 'Repetition builds a skyline', 'Break the sentence open'],
   ['Meaning through glass', 'Documents find coordinates', 'Let common words lose gravity', 'A change of perspective', 'One word. Two constellations', 'The document scanner'],
 ];

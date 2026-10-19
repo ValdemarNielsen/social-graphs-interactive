@@ -79,7 +79,8 @@ const sentenceWords=['the','network','is','a','story','of','the','people','and',
 const sentencePoints:ScenePoint[]=[{x:85,y:145},{x:225,y:145},{x:365,y:145},{x:430,y:145},{x:535,y:145},{x:105,y:250},{x:195,y:250},{x:345,y:250},{x:505,y:250},{x:135,y:355},{x:290,y:355},{x:475,y:355}];
 const tokenDestination=(i:number)=>({x:135+(i%4)*150,y:150+Math.floor(i/4)*105});
 // Equal screen units on both axes preserve the angle used by cosine similarity.
-const vectorEndpoints:ScenePoint[]=[{x:385,y:290},{x:280,y:185},{x:175,y:80}];
+const vectorOrigin:ScenePoint={x:330,y:365};
+const vectorEndpoints:ScenePoint[]=[{x:510,y:275},{x:420,y:185},{x:330,y:95}];
 const vectorWords=[['star','star','light'],['star','light','light'],['light','light','light']];
 
 function SceneNode({point,label,className='',secondary=false,small=false}:{point:ScenePoint;label:string;className?:string;secondary?:boolean;small?:boolean}){
@@ -158,17 +159,37 @@ function LanguageScene({still}:{still:boolean}){
 }
 
 function VectorScene({still}:{still:boolean}){
- const origin={x:175,y:395};
  return <>
-  <g className="vector-coordinates" opacity={still?1:0}>
-   {[0,1,2,3].map(i=><g key={i} className="vector-grid"><line x1={175+i*105} y1="55" x2={175+i*105} y2="395"/><line x1="175" y1={395-i*105} x2="535" y2={395-i*105}/><text x={175+i*105} y="419" textAnchor="middle">{i}</text><text x="154" y={400-i*105} textAnchor="end">{i}</text></g>)}
-   <path d="M175 55V395H550" className="vector-axes"/><text x="545" y="443" textAnchor="end" className="scene-label">STAR COUNT →</text><text x="175" y="39" className="scene-label">LIGHT COUNT ↑</text>
+  <text className="vector-register-heading" x="32" y="43">THREE DOCUMENTS</text>
+  <text className="vector-axis-heading" x="330" y="43">LIGHT COUNT ↑</text>
+  <path className="vector-register-rule" d="M32 56H258 M292 24V476"/>
+  {vectorWords.map((words,d)=><g key={d} className={`vector-document vector-color-${d}`}>
+   <rect className="vector-document-paper" x="32" y={83+d*108} width="226" height="88" rx="3"/>
+   <path className="vector-document-tab" d={`M32 ${83+d*108}h3v88h-3z`}/>
+   <text className="vector-document-letter" x="48" y={112+d*108}>{'ABC'[d]}</text>
+   <text className="vector-document-count" x="243" y={110+d*108} textAnchor="end">{['2 star / 1 light','1 star / 2 light','0 star / 3 light'][d]}</text>
+   {words.map((word,t)=><text key={t} className="vector-source-word" x={76+t*65} y={150+d*108} textAnchor="middle">{word}</text>)}
+  </g>)}
+  <g className="vector-coordinates">
+   {[0,1,2,3].map(i=><g key={i} className="vector-grid"><line x1={330+i*90} y1="72" x2={330+i*90} y2="365"/><line x1="330" y1={365-i*90} x2="637" y2={365-i*90}/><text x={330+i*90} y="388" textAnchor="middle">{i}</text>{i>0&&<text x="314" y={369-i*90} textAnchor="end">{i}</text>}</g>)}
+   <path d="M330 72V365H637" className="vector-axes" pathLength="1" strokeDasharray="1" strokeDashoffset={still?0:1}/>
+   <text x="637" y="409" textAnchor="end" className="vector-axis-heading">STAR COUNT →</text>
+   <circle className="vector-origin" cx="330" cy="365" r="3"/>
   </g>
-  <g className="vector-document-labels" opacity={still?0:1}>{['A','B','C'].map((label,i)=><text key={label} x="80" y={153+i*110} className="scene-label">{label}</text>)}</g>
-  {vectorWords.flatMap((words,d)=>words.map((word,t)=><g key={`${d}-${t}`} className={`vector-word vector-word-${d}`} opacity={still?0:1} transform={`translate(${195+t*170} ${150+d*110})`}><rect x="-68" y="-37" width="136" height="67" rx="14"/><text textAnchor="middle" y="7">{word}</text></g>))}
-  {vectorEndpoints.map((p,i)=><g key={i} className={`vector-destination vector-color-${i}`} opacity={still?1:0}><line className="vector-ray" x1={origin.x} y1={origin.y} x2={p.x} y2={p.y} pathLength="1" strokeDasharray="1" strokeDashoffset={still?0:1}/><circle cx={p.x} cy={p.y} r="8"/><circle cx={p.x} cy={p.y} r="17" className="vector-point-orbit"/><text x={p.x+24} y={p.y+5} className="scene-label">{['A (2,1)','B (1,2)','C (0,3)'][i]}</text></g>)}
-  <g className="vector-angle" opacity={still?1:0}><path d="M237.61 363.7A70 70 0 0 0 206.3 332.39"/><text x="260" y="370" className="scene-annotation">cos(A,B) = 0.800</text></g>
-  <text x="360" y="465" className="scene-annotation vector-caption" opacity={still?1:0} textAnchor="middle">exact word-count coordinates · no learned embeddings</text>
+  <path className="vector-angle-area" d="M330 365 510 275 420 185Z" opacity={still?1:0}/>
+  {vectorEndpoints.map((p,i)=><g key={i} className={`vector-geometry vector-color-${i}`}>
+   {i<2&&<path className="vector-projection" d={`M330 ${p.y}H${p.x}V365`} pathLength="1" strokeDasharray="1" strokeDashoffset={still?0:1}/>}
+   <line className="vector-ray" x1={vectorOrigin.x} y1={vectorOrigin.y} x2={p.x} y2={p.y} pathLength="1" strokeDasharray="1" strokeDashoffset={still?0:1}/>
+   <g className="vector-destination" opacity={still?1:0}><circle cx={p.x} cy={p.y} r="5"/><circle cx={p.x} cy={p.y} r="11" className="vector-point-orbit"/><text x={p.x+15} y={p.y-13} className="vector-point-label">{['A (2,1)','B (1,2)','C (0,3)'][i]}</text></g>
+  </g>)}
+  {vectorWords.flatMap((words,d)=>words.map((word,t)=><g key={`${d}-${t}`} className={`vector-word vector-word-${d} vector-color-${d}`} opacity={still?0:1} transform={`translate(${76+t*65} ${145+d*108})`}><rect x="-29" y="-19" width="58" height="30" rx="3"/><text textAnchor="middle" y="2">{word}</text></g>))}
+  <g className="vector-angle" opacity={still?1:0}>
+   <path d="M376.51 341.74A52 52 0 0 0 353.26 318.49"/>
+   <path className="vector-angle-leader" d="M370 331 464 331 481 348"/>
+   <text x="485" y="359" className="vector-angle-label">same direction?</text>
+  </g>
+  <g className="vector-comparison" opacity={still?1:0}><path d="M330 431H670"/><text x="330" y="455">COSINE / A · B</text><text className="vector-score" x="670" y="465" textAnchor="end">0.800</text></g>
+  <text x="32" y="438" className="vector-caption">Chosen axes.</text><text x="32" y="460" className="vector-caption">Not learned embeddings.</text>
  </>;
 }
 
@@ -176,7 +197,7 @@ export function Story({week,reduced}:{week:number;reduced:boolean}){
  const root=useRef<HTMLDivElement>(null);
  const [act,setAct]=useState(reduced?2:0);
  const acts=sceneActs[week-1];
- const onProgress=useCallback((progress:number)=>setAct(Math.min(2,Math.floor(progress*3))),[]);
+ const onProgress=useCallback((progress:number)=>setAct(week===6?(progress<.22?0:progress<.55?1:2):Math.min(2,Math.floor(progress*3))),[week]);
  const build=useCallback((el:HTMLElement)=>{
    const q=(selector:string)=>el.querySelectorAll(selector);
    const timeline=gsap.timeline({paused:true,defaults:{ease:'power2.inOut'}});
@@ -188,8 +209,11 @@ export function Story({week,reduced}:{week:number;reduced:boolean}){
     {rotationY:-25,rotationX:32,rotationZ:7,z:100,y:35,scale:.9},
     {rotationY:-11,rotationX:7,rotationZ:0,z:0,y:28,scale:1}
    ][week-1];
-   // Travel into the model, then arrive at an undistorted reading plane.
-   timeline.fromTo(q('.story-glass-front'),camera,{rotationY:0,rotationX:0,rotationZ:0,z:0,y:0,scale:1,duration:1.55},0)
+   // The coordinate sheet stays flat: movement belongs to the evidence, and
+   // the equal-unit geometry stays readable from the very first frame.
+   if(week===6){
+    timeline.fromTo(q('.story-progress-fill'),{scaleX:0},{scaleX:1,duration:2.4,ease:'none'},0);
+   }else timeline.fromTo(q('.story-glass-front'),camera,{rotationY:0,rotationX:0,rotationZ:0,z:0,y:0,scale:1,duration:1.55},0)
     .fromTo(q('.story-glass-back'),{x:75,y:55,z:-180,rotationY:25,rotationZ:14},{x:-22,y:-22,z:-20,rotationY:0,rotationZ:-3,duration:2.5},0)
     .fromTo(q('.story-glass-middle'),{x:-60,y:30,z:-90,rotationY:-20,rotationZ:-12},{x:16,y:16,z:-8,rotationY:0,rotationZ:2,duration:2.3},0)
     .fromTo(q('.story-ghost-number'),{y:75},{y:-80,duration:3,ease:'none'},0)
@@ -197,45 +221,53 @@ export function Story({week,reduced}:{week:number;reduced:boolean}){
     .fromTo(q('.story-glass-sheen'),{xPercent:-130},{xPercent:130,duration:3,ease:'none'},0);
    if(week===2||week===3)timeline.fromTo(q('.story-orbit-cage'),{rotationZ:-45,scale:.7,opacity:.2},{rotationZ:115,scale:1.12,opacity:.65,duration:3,ease:'none'},0);
    if(week===1){
-    timeline.to(q('.matrix-source'),{opacity:0,duration:.6},.55).to(q('.matrix-watermark'),{opacity:0,duration:.6},.55)
-     .to(q('.matrix-traveller'),{attr:{transform:(i:number)=>`translate(192 ${138+i*48})`},duration:1.2,stagger:.045},.65)
+    timeline.to(q('.matrix-source'),{opacity:0,duration:.5},0).to(q('.matrix-watermark'),{opacity:0,duration:.5},0)
+     .to(q('.matrix-traveller'),{attr:{transform:(i:number)=>`translate(192 ${138+i*48})`},duration:1.2,stagger:.045,ease:'power2.out'},0)
      .to(q('.matrix-cells'),{opacity:1,duration:.7},1.45).from(q('.matrix-cell'),{opacity:0,scale:.8,transformOrigin:'center',stagger:.012,duration:.35},1.4);
    }
    if(week===2){
-    timeline.to(q('.long-route'),{opacity:.15,duration:.6},1).to(q('.shortcut-flyover'),{attr:{'stroke-dashoffset':0},duration:1.1,ease:'power1.inOut'},.9)
+    timeline.to(q('.long-route'),{opacity:.15,duration:.6},.45).to(q('.shortcut-flyover'),{attr:{'stroke-dashoffset':0},duration:1.1,ease:'power1.out'},0)
      .to(q('.shortcut-before'),{opacity:0,y:-18,duration:.4},1.25).fromTo(q('.shortcut-after'),{opacity:0,y:18},{opacity:1,y:0,duration:.5},1.6);
     const ship=q('.shortcut-ship')[0];const travel={t:0};
-    timeline.to(travel,{t:1,duration:1.2,ease:'none',onUpdate:()=>{const t=travel.t,u=1-t;ship.setAttribute('transform',`translate(${360*u*u*u+3*640*u*u*t+3*640*u*t*t+360*t*t*t} ${93*u*u*u+3*150*u*u*t+3*350*u*t*t+407*t*t*t})`)}},1.4);
+    timeline.to(travel,{t:1,duration:1.2,ease:'none',onUpdate:()=>{const t=travel.t,u=1-t;ship.setAttribute('transform',`translate(${360*u*u*u+3*640*u*u*t+3*640*u*t*t+360*t*t*t} ${93*u*u*u+3*150*u*u*t+3*350*u*t*t+407*t*t*t})`)}},.08);
    }
    if(week===3){
     for(let layer=1;layer<=5;layer++){
-     const time=.22+layer*.38;
-     timeline.to(q(`.bfs-depth-${layer}`),{opacity:1,duration:.3},time)
-      .to(q(`.bfs-wave-${layer}`),{opacity:.5,duration:.22},time-.1).to(q(`.bfs-wave-${layer}`),{opacity:.08,duration:.5},time+.18);
+     const time=(layer-1)*.38;
+     timeline.to(q(`.bfs-depth-${layer}`),{opacity:1,duration:.3,ease:'power1.out'},time)
+      .to(q(`.bfs-wave-${layer}`),{opacity:.5,duration:.22},Math.max(0,time-.1)).to(q(`.bfs-wave-${layer}`),{opacity:.08,duration:.5},time+.18);
     }
     timeline.to(q('.bfs-result'),{opacity:1,duration:.5},2.5);
    }
    if(week===4){
-    timeline.to(q('.community-traveller'),{attr:{transform:(i:number)=>`translate(${communityEnd[i].x} ${communityEnd[i].y})`},duration:1.6},.55)
-     .to(q('.community-link'),{attr:{x1:(i:number)=>communityEnd[communityEdges[i][0]].x,y1:(i:number)=>communityEnd[communityEdges[i][0]].y,x2:(i:number)=>communityEnd[communityEdges[i][1]].x,y2:(i:number)=>communityEnd[communityEdges[i][1]].y},duration:1.6},.55)
-     .to(q('.community-fields'),{opacity:1,duration:1},1).to(q('.community-result'),{opacity:1,duration:.6},2.2);
+    timeline.to(q('.community-traveller'),{attr:{transform:(i:number)=>`translate(${communityEnd[i].x} ${communityEnd[i].y})`},duration:1.6,ease:'power2.out'},0)
+     .to(q('.community-link'),{attr:{x1:(i:number)=>communityEnd[communityEdges[i][0]].x,y1:(i:number)=>communityEnd[communityEdges[i][0]].y,x2:(i:number)=>communityEnd[communityEdges[i][1]].x,y2:(i:number)=>communityEnd[communityEdges[i][1]].y},duration:1.6,ease:'power2.out'},0)
+     .to(q('.community-fields'),{opacity:1,duration:1},.12).to(q('.community-result'),{opacity:1,duration:.6},2.2);
    }
    if(week===5){
-    timeline.to(q('.language-thread'),{opacity:0,duration:.6},.3)
-     .to(q('.language-tile'),{attr:{transform:(i:number)=>{const p=tokenDestination(i);return `translate(${p.x} ${p.y})`}},duration:1.2,stagger:.035},.55)
-     .to(q('.language-tile-glass'),{opacity:1,duration:.6,stagger:.03},1.1)
+    timeline.to(q('.language-thread'),{opacity:0,duration:.6},0)
+     .to(q('.language-tile'),{attr:{transform:(i:number)=>{const p=tokenDestination(i);return `translate(${p.x} ${p.y})`}},duration:1.2,stagger:.035,ease:'power2.out'},0)
+     .to(q('.language-tile-glass'),{opacity:1,duration:.6,stagger:.03},.45)
      .to(q('.language-index'),{opacity:1,duration:.4,stagger:.03},1.5)
      .to(q('.repeat-mark'),{opacity:1,duration:.4,stagger:.12},2)
      .to(q('.language-result'),{opacity:1,duration:.6},2.3);
    }
    if(week===6){
-    timeline.to(q('.vector-document-labels'),{opacity:0,duration:.4},.55).to(q('.vector-coordinates'),{opacity:1,duration:.7},.8);
-    for(let i=0;i<3;i++){const p=vectorEndpoints[i];timeline.to(q(`.vector-word-${i}`),{attr:{transform:`translate(${p.x} ${p.y})`},opacity:0,duration:1.1,stagger:.07},.55+i*.16);}
-    timeline.to(q('.vector-destination'),{opacity:1,duration:.5,stagger:.12},1.65)
-     .to(q('.vector-ray'),{attr:{'stroke-dashoffset':0},duration:.8,stagger:.12},1.6)
-     .to(q('.vector-angle'),{opacity:1,duration:.5},2.35).to(q('.vector-caption'),{opacity:1,duration:.5},2.5);
+    timeline.to(q('.vector-axes'),{attr:{'stroke-dashoffset':0},duration:.6,ease:'power1.out'},0)
+     .fromTo(q('.vector-grid'),{opacity:.3},{opacity:1,duration:.65,stagger:.035,ease:'power1.out'},0)
+     .to(q('.vector-ray'),{attr:{'stroke-dashoffset':0},duration:.85,stagger:.1,ease:'power1.out'},0)
+     .to(q('.vector-projection'),{attr:{'stroke-dashoffset':0},duration:.55,stagger:.12,ease:'power1.out'},.35);
+    for(let i=0;i<3;i++){
+     const p=vectorEndpoints[i];
+     timeline.to(q(`.vector-word-${i}`),{attr:{transform:`translate(${p.x} ${p.y}) scale(.22)`},duration:.85,stagger:.06,ease:'power2.out'},i*.12)
+      .to(q(`.vector-word-${i}`),{opacity:0,duration:.28,stagger:.06,ease:'power1.in'},.5+i*.12);
+    }
+    timeline.to(q('.vector-destination'),{opacity:1,duration:.3,stagger:.12},.55)
+     .to(q('.vector-angle-area'),{opacity:1,duration:.45},.9)
+     .to(q('.vector-angle'),{opacity:1,duration:.4},1.05)
+     .to(q('.vector-comparison'),{opacity:1,duration:.45},1.1);
    }
-   return gsap.timeline({paused:true}).add(timeline.paused(false).timeScale(timeline.duration()/7.5));
+   return gsap.timeline({paused:true}).add(timeline.paused(false).timeScale(timeline.duration()/(week===6?4.8:7.5)));
  },[week]);
  const {paused,togglePause,restart}=useVisibleSequence({root,reduced,build,onProgress});
  return <div ref={root} className={`story cinematic-story story-${week} ${reduced?'static':''}`} data-act={act}>

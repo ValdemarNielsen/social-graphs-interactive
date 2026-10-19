@@ -10,11 +10,8 @@ export type MatterSculptureProps = {
   active?: boolean;
 };
 
-// Original procedural sculptures and studio lighting. These are visual metaphors,
-// not network simulations, physical fluid models, or measured optical materials.
-// Technique references (no third-party shader implementation is included):
-// https://tympanus.net/codrops/2025/06/09/how-to-create-interactive-droplet-like-metaballs-with-three-js-and-glsl/
-// https://tympanus.net/Tutorials/LiquidRaymarching/
+// Original procedural aperture and folded-paper sculptures under studio lighting.
+// These visual metaphors are not network simulations or measured optical materials.
 const vertexSource = `
 attribute vec2 position;
 void main() { gl_Position = vec4(position, 0.0, 1.0); }
@@ -35,9 +32,9 @@ mat2 rotation(float angle) {
   return mat2(c, -s, s, c);
 }
 vec3 objectSpace(vec3 p) {
-  p.yz = rotation(0.38 + pointer.y * 0.32 + travel * 0.11) * p.yz;
-  p.xz = rotation(clock * 0.17 + pointer.x * 0.55 + travel * 0.45 + phase * 0.13) * p.xz;
-  p.xy = rotation(-0.22 + 0.06 * sin(clock * 0.31)) * p.xy;
+  p.yz = rotation(0.32 + pointer.y * 0.20 + travel * 0.08) * p.yz;
+  p.xz = rotation(0.30 + 0.18*sin(clock*0.10) + pointer.x*0.32 + travel*0.16 + phase*0.08) * p.xz;
+  p.xy = rotation(-0.22 + 0.04 * sin(clock * 0.18)) * p.xy;
   return p;
 }
 float roundBox(vec3 p, vec3 halfSize, float radius) {
@@ -57,71 +54,73 @@ float fused(float a, float b, float reach) {
 // and a warm light reflected in the object. No cubemap or image assets required.
 vec3 studio(vec3 direction, float pearl) {
   float sky = smoothstep(-0.45, 0.8, direction.y);
-  vec3 dark = mix(vec3(0.012, 0.025, 0.048), vec3(0.035, 0.045, 0.105), pearl);
-  vec3 light = mix(vec3(0.34, 0.48, 0.64), vec3(0.50, 0.65, 0.83), pearl);
+  vec3 dark = mix(vec3(0.018, 0.025, 0.032), vec3(0.07, 0.075, 0.064), pearl);
+  vec3 light = mix(vec3(0.38, 0.43, 0.48), vec3(0.60, 0.59, 0.51), pearl);
   vec3 result = mix(dark, light, sky);
   float largeBox = pow(max(dot(direction, normalize(vec3(-0.65, 0.75, 0.55))), 0.0), 15.0);
   float smallBox = pow(max(dot(direction, normalize(vec3(0.75, 0.15, 0.65))), 0.0), 48.0);
   float strip = pow(max(1.0 - abs(dot(direction, normalize(vec3(0.6, 0.18, -0.7)))), 0.0), 125.0);
   float warm = pow(max(dot(direction, normalize(vec3(-0.1, -0.6, 0.8))), 0.0), 9.0);
-  result += vec3(3.7, 3.9, 4.0) * largeBox;
-  result += mix(vec3(1.1, 1.9, 3.1), vec3(3.2, 0.70, 2.0), pearl) * smallBox;
-  result += mix(vec3(3.5, 3.8, 3.7), vec3(0.65, 3.3, 3.8), pearl) * strip;
-  result += mix(vec3(2.8, 0.43, 0.035), vec3(1.5, 0.24, 0.72), pearl) * warm;
+  result += vec3(2.8, 2.85, 2.75) * largeBox;
+  result += mix(vec3(0.70, 0.88, 1.05), vec3(0.8, 0.76, 0.61), pearl) * smallBox;
+  result += mix(vec3(2.5, 2.65, 2.55), vec3(1.4, 1.32, 1.10), pearl) * strip;
+  result += vec3(0.42,0.24,0.13) * warm;
   float violetBox = pow(max(dot(direction, normalize(vec3(0.15,0.35,-0.85))),0.0),12.0);
-  result += vec3(1.5,0.55,2.6)*violetBox*pearl;
+  result += vec3(0.24,0.29,0.25)*violetBox*pearl;
   float flag = smoothstep(0.22, 0.25, direction.x) * (1.0 - smoothstep(0.44, 0.47, direction.x));
   return result * (1.0 - flag * 0.63);
 }
 `;
 
 const machineGeometry = `
+float annulus(vec3 p, float radius, vec2 section, float bevel) {
+  vec2 q = abs(vec2(length(p.xy)-radius,p.z))-section;
+  return length(max(q,0.0))+min(max(q.x,q.y),0.0)-bevel;
+}
 vec2 scene(vec3 point) {
   vec3 p = objectSpace(point);
-  float breathing = 0.5 + 0.5 * sin(clock * 0.68);
-  float spacing = 0.47 + breathing * 0.12 + burst * 0.34;
-  vec3 folded = abs(p) - vec3(spacing);
-  float cube = roundBox(folded, vec3(0.175), 0.055);
-  float ball = length(folded) - 0.235;
-  float rounding = 0.13 + 0.75 * pow(0.5 + 0.5 * sin(clock * 0.37), 3.0);
-  vec2 result = vec2(mix(cube, ball, rounding), 1.0);
-
-  // Twelve telescoping struts: a different folded axis creates each family.
-  vec3 a = abs(p);
-  float rods = roundBox(vec3(p.x, a.y-spacing, a.z-spacing), vec3(spacing, 0.018, 0.018), 0.015);
-  rods = min(rods, roundBox(vec3(a.x-spacing, p.y, a.z-spacing), vec3(0.018, spacing, 0.018), 0.015));
-  rods = min(rods, roundBox(vec3(a.x-spacing, a.y-spacing, p.z), vec3(0.018, 0.018, spacing), 0.015));
-  result = nearer(result, vec2(rods, 2.0));
-
-  vec3 g = p;
-  g.yz = rotation(clock * 0.36 + burst * 0.7) * g.yz;
-  float outerRing = ringDistance(g, 1.17 + burst * 0.18, 0.031);
-  g = p;
-  g.xz = rotation(1.15 - clock * 0.29) * g.xz;
-  float middleRing = ringDistance(g, 0.92 + burst * 0.12, 0.045);
-  g = p;
-  g.yz = rotation(1.5708) * g.yz;
-  g.xz = rotation(clock * 0.40) * g.xz;
-  float innerRing = ringDistance(g, 0.53 + burst * 0.04, 0.027);
-  result = nearer(result, vec2(min(outerRing, middleRing), 1.0));
-  result = nearer(result, vec2(innerRing, 3.0));
-
-  float core = length(p) - (0.245 + 0.025 * sin(clock * 1.5));
-  result = nearer(result, vec2(core, 3.0));
+  float opening = 0.12+burst*0.8+0.04*sin(clock*0.38);
+  // A precise housing, a recessed rear rim, and eight independently bevelled leaves.
+  vec2 result = vec2(annulus(p,1.08,vec2(0.075,0.065),0.018),1.0);
+  vec3 rear = p-vec3(0.0,0.0,-0.13);
+  result = nearer(result,vec2(annulus(rear,1.04,vec2(0.10,0.025),0.012),2.0));
+  float sector = floor((atan(p.y,p.x)+0.392699)/0.785398)*0.785398;
+  vec3 blade = p;
+  blade.xy = rotation(sector)*blade.xy;
+  blade.xy -= vec2(0.67+opening*0.16,0.0);
+  blade.xy = rotation(-0.50-opening*0.56)*blade.xy;
+  blade.z -= 0.012+0.018*sin(sector);
+  float leaf = roundBox(blade,vec3(0.35,0.115,0.029),0.022);
+  result = nearer(result,vec2(leaf,2.0));
+  vec3 pin = p;
+  pin.xy = rotation(sector)*pin.xy;
+  pin -= vec3(1.075,0.0,0.077);
+  result = nearer(result,vec2(length(pin)-0.024,1.0));
+  vec3 aperture = p-vec3(0.0,0.0,-0.075);
+  float innerRim = annulus(aperture,0.31+opening*0.25,vec2(0.011,0.012),0.008);
+  result = nearer(result,vec2(innerRim,3.0));
   return result;
 }
 `;
 
-const liquidGeometry = `
+const paperGeometry = `
 vec2 scene(vec3 point) {
   vec3 p = objectSpace(point);
-  float distance = 5.0;
-  float reach = 0.33 - burst * 0.13;
-  for (int i = 0; i < 7; i++) {
-    float sphere = length(p - lobes[i].xyz) - lobes[i].w;
-    distance = fused(distance, sphere, reach);
+  float radial = length(p.xy);
+  vec2 unit = p.xy/max(radial,0.0001);
+  float sinTwo = 2.0*unit.x*unit.y;
+  float cosTwo = unit.x*unit.x-unit.y*unit.y;
+  vec2 result = vec2(5.0,4.0);
+  // Seven continuous folded paper bands. The blend field is intentionally gone:
+  // clear edges, open space, and cast shadows keep every sheet distinguishable.
+  for (int i=0; i<7; i++) {
+    float radius = lobes[i].w+0.10*(unit.x*lobes[i].x-unit.y*lobes[i].y);
+    float fold = 0.20*(sinTwo*lobes[i].x+cosTwo*lobes[i].y);
+    vec2 crossSection = abs(vec2(radial-radius,p.z-fold-lobes[i].z))-vec2(0.135,0.012);
+    float sheet = length(max(crossSection,0.0))+min(max(crossSection.x,crossSection.y),0.0)-0.005;
+    result = nearer(result,vec2(sheet,4.0+float(i)*0.1));
   }
-  return vec2(distance, 4.0);
+  return result;
 }
 `;
 
@@ -165,7 +164,7 @@ void main() {
     vec2 sampleValue = scene(point);
     if (sampleValue.y > 2.5 && sampleValue.y < 3.5) emission += 0.0018/(0.02+abs(sampleValue.x));
     if (sampleValue.x < 0.0018) { hit=1.0; material=sampleValue.y; break; }
-    distance += max(sampleValue.x*0.75, 0.001);
+    distance += max(sampleValue.x*0.64, 0.001);
     if (distance > 7.0) break;
   }
 
@@ -190,36 +189,31 @@ void main() {
     vec3 environment = studio(reflection,pearl);
 
     if (pearl < 0.5) {
-      vec3 metal = mix(vec3(0.57,0.65,0.71),vec3(0.14,0.21,0.26),step(1.5,material));
-      color = environment*metal*(0.84+0.92*fresnel);
-      color += vec3(0.13,0.20,0.27)*diffuse*visibility;
-      color += vec3(1.6,0.23,0.018)*pow(max(0.0,1.0-length(p)/1.45),3.0);
-      color = color*ambient + vec3(4.1,4.2,3.9)*shine*visibility;
+      vec3 metal = mix(vec3(0.72,0.77,0.78),vec3(0.32,0.39,0.43),step(1.5,material));
+      color = environment*metal*(0.86+0.65*fresnel);
+      color += vec3(0.12,0.15,0.17)*diffuse*visibility;
+      color += vec3(0.22,0.105,0.045)*pow(max(0.0,1.0-length(p)/1.25),3.0);
+      color = color*ambient + vec3(2.7,2.7,2.5)*shine*visibility;
       if (material > 2.5) {
-        float bands = 0.7+0.3*sin(objectSpace(p).y*45.0+clock*2.0);
-        color = vec3(3.2,0.47,0.035)*bands + vec3(1.0,0.7,0.22)*shine;
+        color = vec3(1.05,0.42,0.13)+vec3(1.0,0.85,0.61)*shine;
       }
     } else {
-      vec3 transmittedR = refract(direction,n,1.0/1.39);
-      vec3 transmittedG = refract(direction,n,1.0/1.42);
-      vec3 transmittedB = refract(direction,n,1.0/1.45);
-      vec3 transmission = vec3(studio(transmittedR,1.0).r,studio(transmittedG,1.0).g,studio(transmittedB,1.0).b);
-      vec3 interference = 0.5+0.5*cos(vec3(0.1,2.2,4.3)+facing*8.8+p.y*0.65+clock*0.055);
-      vec3 pearlTint = mix(vec3(0.70,0.89,0.80),interference,0.38+0.27*fresnel);
-      float thickness = clamp(-scene(p+direction*0.36).x*2.0,0.0,1.0);
-      color = environment*(0.65+fresnel*1.20)*mix(vec3(0.94,0.98,1.0),pearlTint,0.42);
-      color += transmission*vec3(0.74,0.93,1.0)*(0.49+thickness*0.26);
-      color += pearlTint*(0.09+diffuse*0.16)*visibility;
-      color = color*(0.70+ambient*0.30) + vec3(5.2,5.4,5.0)*shine*visibility;
-      color += interference*pow(1.0-facing,2.0)*0.39;
+      float sheetIndex = (material-4.0)*10.0;
+      float tinted = smoothstep(3.5,5.5,sheetIndex)*0.10;
+      vec3 paper = mix(vec3(0.98,0.955,0.88),vec3(0.84,0.89,0.80),tinted);
+      float backLight = pow(max(dot(-n,light),0.0),2.0);
+      color = paper*(0.88+0.18*diffuse*visibility)*(0.84+0.16*ambient);
+      color += environment*0.014*fresnel;
+      color += vec3(0.065,0.055,0.035)*backLight;
+      color += vec3(0.085,0.080,0.063)*pow(1.0-facing,1.7);
     }
-    color=finishColor(color);
+    color=pearl<0.5 ? finishColor(color) : clamp(color,0.0,1.0);
     alpha=1.0;
   }
   if (pearl < 0.5 && emission > 0.0) {
-    float glow = min(emission,0.55);
-    color += vec3(1.0,0.24,0.025)*glow*0.35;
-    alpha = max(alpha,glow*0.25);
+    float glow = min(emission,0.18);
+    color += vec3(0.75,0.35,0.11)*glow*0.15;
+    alpha = max(alpha,glow*0.15);
   }
   gl_FragColor=vec4(color,alpha);
 }
@@ -271,7 +265,7 @@ export default function MatterSculpture({ week, reduced, phase = 0, active = fal
     };
     try {
       const highPrecision = (gpu.getShaderPrecisionFormat(gpu.FRAGMENT_SHADER, gpu.HIGH_FLOAT)?.precision ?? 0) > 0;
-      const source = commonShader + (week === 2 ? machineGeometry : liquidGeometry) + lightingShader.replace('PEARL_MODE', week === 4 ? '1.0' : '0.0');
+      const source = commonShader + (week === 2 ? machineGeometry : paperGeometry) + lightingShader.replace('PEARL_MODE', week === 4 ? '1.0' : '0.0');
       const vertex = compile(gpu.VERTEX_SHADER, vertexSource);
       const fragment = compile(gpu.FRAGMENT_SHADER, highPrecision ? source : source.replace('precision highp float;', 'precision mediump float;'));
       program = gpu.createProgram();
@@ -304,7 +298,7 @@ export default function MatterSculpture({ week, reduced, phase = 0, active = fal
       lobes: gpu.getUniformLocation(program, 'lobes[0]'),
     };
     let raf = 0, visible = false, lost = false, disposed = false;
-    let last = 0, elapsed = week === 2 ? 3.8 : 5.1, quality = 1;
+    let last = 0, lastDraw = 0, elapsed = week === 2 ? 3.8 : 5.1, quality = 1, limitedFrameRate = false;
     let sampledFrames = 0, sampledTime = 0, smoothedBurst = reduced ? 0.18 : 0;
     let targetScroll = 0, scroll = 0;
     const target = { x: 0, y: 0 }, pointer = { x: 0, y: 0 };
@@ -318,32 +312,33 @@ export default function MatterSculpture({ week, reduced, phase = 0, active = fal
       const factor = Math.min(devicePixelRatio || 1, 1.4, Math.sqrt(pixelBudget / Math.max(1, bounds.width * bounds.height))) * quality;
       canvas.width = Math.max(1, Math.round(bounds.width * factor));
       canvas.height = Math.max(1, Math.round(bounds.height * factor));
+      canvas.dataset.renderQuality = quality.toFixed(2);
+      canvas.dataset.frameBudget = limitedFrameRate ? '30' : '60';
       gpu.viewport(0, 0, canvas.width, canvas.height);
     };
     const updateLobes = (t: number, separation: number) => {
-      // Seven independent centers share a blend field. CPU evaluation keeps
-      // uniform trigonometry out of the distance function's inner GPU loop.
-      const spread = 1 + separation * 0.82 + 0.13 * (0.5 + 0.5 * Math.sin(t * .52));
-      const set = (i: number, x: number, y: number, z: number, radius: number) => {
-        blobData[i * 4] = x * spread;
-        blobData[i * 4 + 1] = y * spread;
-        blobData[i * 4 + 2] = z * spread;
-        blobData[i * 4 + 3] = radius;
-      };
-      set(0, -.46 + Math.sin(t * .46) * .17, .15 + Math.cos(t * .38) * .16, .10, .51);
-      set(1, .47 + Math.cos(t * .39) * .14, -.06 + Math.sin(t * .51) * .17, -.05, .49);
-      set(2, .07 + Math.sin(t * .31) * .22, .62 + Math.cos(t * .42) * .12, Math.sin(t * .41) * .21, .40);
-      set(3, -.04 + Math.cos(t * .43) * .18, -.63 + Math.sin(t * .37) * .10, .08, .42);
-      set(4, -.18 + Math.sin(t * .58) * .40, .08, .55 + Math.cos(t * .32) * .10, .32);
-      set(5, Math.cos(t * .36) * .94, Math.sin(t * .36) * .72, -.27, .22);
-      set(6, Math.sin(t * .42 + 1.7) * .99, Math.cos(t * .42 + 1.7) * .76, .15, .18);
+      // Precompute the seven fold phases and sheet spacings once per frame.
+      // The inner raymarch evaluates continuous bands without per-sheet trig.
+      for (let i=0; i<7; i++) {
+        const angle = i*.57+t*.08;
+        blobData[i*4] = Math.cos(angle);
+        blobData[i*4+1] = Math.sin(angle);
+        blobData[i*4+2] = (i-3)*(.15+separation*.13);
+        blobData[i*4+3] = .70+i*.035+separation*.08;
+      }
       gpu.uniform4fv(locations.lobes, blobData);
     };
     const draw = (now: number) => {
       if (lost || disposed || document.hidden) return;
+      // Preserve the machined edges on slower devices: reduce frame frequency,
+      // not successively the spatial detail of the material.
+      if (limitedFrameRate && !reduced && lastDraw && now - lastDraw < 30) {
+        if (visible) raf = requestAnimationFrame(draw);
+        return;
+      }
       const rawDt = last ? Math.max(0, now - last) : 16.7;
       const dt = Math.min(rawDt, 65);
-      last = now;
+      last = now; lastDraw = now;
       if (!reduced) elapsed += dt * .001;
       const ease = reduced ? 1 : 1 - Math.exp(-dt * .005);
       pointer.x += (target.x - pointer.x) * ease;
@@ -353,10 +348,10 @@ export default function MatterSculpture({ week, reduced, phase = 0, active = fal
       const burstTarget = reduced ? (trigger.active || trigger.phase % 2 ? .72 : .18) : Math.max(trigger.active ? .65 : 0, trigger.pulse);
       smoothedBurst += (burstTarget - smoothedBurst) * (reduced ? 1 : 1 - Math.exp(-dt * .009));
       if (!reduced) trigger.pulse *= Math.exp(-dt * .00072);
-      if (!reduced && visible && rawDt < 150) {
+      if (!reduced && visible && !limitedFrameRate && rawDt < 150) {
         sampledFrames++; sampledTime += rawDt;
         if (sampledFrames >= 75) {
-          if (sampledTime / sampledFrames > 26 && quality > .46) { quality = Math.max(.45, quality * .78); resizeBuffer(); }
+          if (sampledTime / sampledFrames > 26) { quality = .85; limitedFrameRate = true; resizeBuffer(); }
           sampledFrames = 0; sampledTime = 0;
         }
       }
@@ -434,11 +429,11 @@ export default function MatterSculpture({ week, reduced, phase = 0, active = fal
     };
   }, [week, reduced, generation]);
 
-  return <div className={`matter-sculpture matter-${week} ${unavailable ? 'matter-unavailable' : ''} ${reduced ? 'matter-still' : ''}`} aria-hidden="true">
+  return <div className={`matter-sculpture matter-${week} ${unavailable ? 'matter-unavailable' : ''} ${reduced ? 'matter-still' : ''}`} data-active={active} aria-hidden="true">
     <div className="matter-atmosphere" />
     <div className="matter-orbit matter-orbit-one" /><div className="matter-orbit matter-orbit-two" />
     <canvas ref={canvasRef} className="matter-canvas" />
-    {unavailable && <div className="matter-fallback"><i className="matter-fallback-core" />{Array.from({ length: week === 2 ? 8 : 7 }, (_, i) => <span key={i} style={{ '--part': i, left: `${(week === 2 ? 14 : 3) + i % 3 * (week === 2 ? 27 : 24)}%`, top: `${(week === 2 ? 12 : 3) + Math.floor(i / 3) * (week === 2 ? 27 : 24)}%` } as CSSProperties} />)}</div>}
-    <div className="matter-notations"><span>{week === 2 ? 'THE POSSIBILITY ENGINE' : 'FORMS OF BELONGING'}</span><span>{week === 2 ? 'STRUCTURE / CHANGE' : 'SEPARATE / TOGETHER'}</span><span>{reduced ? 'A STILL PERSPECTIVE' : 'MOVE CLOSER. CHANGE THE VIEW.'}</span></div>
+    {unavailable && <div className="matter-fallback"><i className="matter-fallback-core" />{Array.from({ length: week === 2 ? 8 : 7 }, (_, i) => <span key={i} style={{ '--part': i } as CSSProperties} />)}</div>}
+    <div className="matter-notations"><span>{week === 2 ? 'APERTURE / A STUDY IN POSSIBILITY' : 'PAPER / FORMS OF BELONGING'}</span><span>{week === 2 ? 'STRUCTURE / CHANGE' : 'SEPARATE / TOGETHER'}</span><span>{reduced ? 'A STILL PERSPECTIVE' : 'MOVE CLOSER. CHANGE THE VIEW.'}</span></div>
   </div>;
 }

@@ -195,22 +195,50 @@
 .story-5.cinematic-story .repeated-tile .language-tile-glass{stroke:#ad5c3b;fill:#d9aa83;fill-opacity:.1}
 .story-5.cinematic-story .language-index{fill:#687460}
 
-/* 06 — vectors suspended in a deep coordinate field. */
-.story-6.cinematic-story .story-composition{grid-template-columns:.8fr 1.5fr;gap:3%}
-.story-6.cinematic-story .story-stage-perspective{perspective:1800px}
-.story-6.cinematic-story .story-glass-front{border:0;border-radius:0;background:radial-gradient(ellipse at 43% 48%,#819de408,transparent 68%);backdrop-filter:none;box-shadow:none;overflow:visible}
-.story-6.cinematic-story .story-glass-back{inset:4% 8%;border-radius:50%;background:radial-gradient(ellipse,#7297e10b,transparent 68%);border:1px solid #a5c7f414;box-shadow:inset 0 0 55px #7d9bd80b,0 0 90px #7d9bd808}
-.story-6.cinematic-story .story-glass-middle{inset:13% -4%;border-radius:50%;background:none;border:1px dashed #d7bdeb18;transform:rotate(-30deg)}
-.story-6.cinematic-story .story-glass-sheen{display:none}
-.story-6.cinematic-story .story-stage-header{padding-left:10%;color:var(--accent);font-size:8px;text-transform:uppercase;letter-spacing:.14em}
-.story-6.cinematic-story .stage-dot{border:0;background:var(--accent);box-shadow:0 0 12px var(--accent)}
-.story-6.cinematic-story .story-stage-footer{margin-inline:10%;border-color:#a5c7f41c}
-.story-6.cinematic-story .story-floating-label{right:10%;bottom:-10px;border-radius:50px;background:#101728ad;border-color:#a5c7f430;box-shadow:0 0 30px #a5c7f408}
-.story-6.cinematic-story .story-ghost-number{right:-2%;top:10%;font:400 clamp(440px,52vw,800px)/.8 var(--serif);color:#a5c7f405;-webkit-text-stroke:1px #a5c7f40c}
-.story-6.cinematic-story .story-atmosphere{background:radial-gradient(ellipse at 68% 45%,#597dc51c,transparent 54%),radial-gradient(ellipse at 82% 30%,#b99be50b,transparent 30%)}
-.story-6.cinematic-story .vector-word rect{fill:#17243b;fill-opacity:.8;stroke-opacity:.32;filter:drop-shadow(0 7px 14px #0003)}
-.story-6.cinematic-story .vector-word text{fill:#e0e9f9}
-.story-6.cinematic-story .vector-destination>circle:not(.vector-point-orbit){filter:drop-shadow(0 0 9px currentColor)}
+/* 06 — a quiet drafting sheet: source evidence beside an exact coordinate plot. */
+.story-6.cinematic-story{--vector-ink:#253c40;--vector-rule:#b7c1b9;--vector-muted:#4f625b;--vector-paper:#f0eee5}
+.story-6.cinematic-story .story-composition{grid-template-columns:.78fr 1.52fr;gap:4%}
+.story-6.cinematic-story .story-stage-perspective{perspective:none}
+.story-6.cinematic-story .story-glass-front{border:1px solid #d9ddd3;border-radius:4px;background:linear-gradient(140deg,#faf8f1,var(--vector-paper) 75%);backdrop-filter:none;box-shadow:0 18px 48px #0002,inset 0 1px 0 #fff;overflow:visible;transform-style:flat;backface-visibility:visible}
+.story-6.cinematic-story .story-glass-back{inset:5px -5px -5px 5px;border-radius:3px;background:#d5d8ce;border:1px solid #c1c8bd;box-shadow:0 5px 9px #0001;transform:none}
+.story-6.cinematic-story .story-glass-middle,.story-6.cinematic-story .story-glass-sheen,.story-6.cinematic-story .story-floating-label{display:none}
+.story-6.cinematic-story .story-stage-header{padding:22px 28px 14px;color:var(--vector-ink);font-size:10px;text-transform:uppercase;letter-spacing:.11em}
+.story-6.cinematic-story .stage-dot{width:6px;height:6px;border:0;background:#54766b;border-radius:1px;box-shadow:none}
+.story-6.cinematic-story .stage-coordinate{color:var(--vector-muted);font-size:8px}
+.story-6.cinematic-story .story-stage-footer{margin-inline:28px;border-color:#b7c1b95e;color:var(--vector-muted);font-size:7px;letter-spacing:.035em;padding-block:12px 16px}
+.story-6.cinematic-story .story-ghost-number{display:none}
+.story-6.cinematic-story .story-atmosphere{background:none}
+.story-6.cinematic-story .cinematic-svg{shape-rendering:geometricPrecision}
+.story-6.cinematic-story .vector-color-0{color:#426c5c}
+.story-6.cinematic-story .vector-color-1{color:#55718d}
+.story-6.cinematic-story .vector-color-2{color:#a56c52}
+.story-6.cinematic-story .vector-register-heading,.story-6.cinematic-story .vector-axis-heading{fill:var(--vector-muted);font:16px var(--display);letter-spacing:.065em}
+.story-6.cinematic-story .vector-register-rule{fill:none;stroke:var(--vector-rule);stroke-width:.8;stroke-opacity:.6}
+.story-6.cinematic-story .vector-document-paper{fill:#faf9f3;stroke:#c9cfc4;stroke-width:.8}
+.story-6.cinematic-story .vector-document-tab{fill:currentColor;fill-opacity:.75}
+.story-6.cinematic-story .vector-document-letter{fill:currentColor;font:26px var(--serif)}
+.story-6.cinematic-story .vector-document-count{fill:var(--vector-muted);font:17px var(--display);letter-spacing:-.015em}
+.story-6.cinematic-story .vector-source-word{fill:#53685e;fill-opacity:.92;font:19px var(--serif)}
+.story-6.cinematic-story .vector-word rect{fill:#f5f6ed;fill-opacity:1;stroke:currentColor;stroke-opacity:.5;stroke-width:.8;filter:none}
+.story-6.cinematic-story .vector-word text{fill:currentColor;font:19px var(--serif)}
+.story-6.cinematic-story .vector-grid line{stroke:#9daea3;stroke-opacity:.27;stroke-width:.8}
+.story-6.cinematic-story .vector-grid text{fill:var(--vector-muted);font:17px var(--display)}
+.story-6.cinematic-story .vector-axes{stroke:var(--vector-ink);stroke-width:1.25;stroke-opacity:.8}
+.story-6.cinematic-story .vector-origin{fill:var(--vector-ink)}
+.story-6.cinematic-story .vector-ray{stroke:currentColor;stroke-width:2;filter:none;stroke-linecap:round}
+.story-6.cinematic-story .vector-projection{fill:none;stroke:currentColor;stroke-width:.85;stroke-opacity:.32}
+.story-6.cinematic-story .vector-destination{color:inherit}
+.story-6.cinematic-story .vector-destination>circle:not(.vector-point-orbit){fill:currentColor;stroke:#f5f3eb;stroke-width:2;filter:none}
+.story-6.cinematic-story .vector-destination>circle.vector-point-orbit{stroke-opacity:.28;stroke-width:.8}
+.story-6.cinematic-story .vector-destination>.vector-point-label{fill:currentColor;font:17px var(--display);letter-spacing:-.02em}
+.story-6.cinematic-story .vector-angle-area{fill:#54766b;fill-opacity:.075}
+.story-6.cinematic-story .vector-angle path{stroke:#647b69;stroke-width:1.1;stroke-dasharray:none}
+.story-6.cinematic-story .vector-angle .vector-angle-leader{stroke-width:.7;stroke-opacity:.6}
+.story-6.cinematic-story .vector-angle>.vector-angle-label{fill:var(--vector-muted);font:italic 18px var(--serif)}
+.story-6.cinematic-story .vector-comparison>path{fill:none;stroke:var(--vector-rule);stroke-width:.8}
+.story-6.cinematic-story .vector-comparison>text{fill:var(--vector-muted);font:16px var(--display);letter-spacing:.055em}
+.story-6.cinematic-story .vector-comparison>.vector-score{fill:var(--vector-ink);font:44px var(--serif);letter-spacing:-.025em}
+.story-6.cinematic-story .vector-caption{fill:var(--vector-muted);font:italic 18px var(--serif)}
 
 @media(min-width:1600px){.cinematic-story .story-act h2{font-size:78px}.story.cinematic-story .cinematic-sticky{width:min(1560px,calc(100% - 160px))}.cinematic-story .story-composition{gap:8%}.story-3.cinematic-story .story-composition{gap:22px}.story-3.cinematic-story .story-act h2{font-size:56px}}
 @media(max-height:820px) and (min-width:1000px){.story.cinematic-story .cinematic-sticky{min-height:570px;padding-block:17px}.cinematic-story .story-topline{padding-bottom:12px}.cinematic-story .story-composition{padding-block:20px 25px}.cinematic-story .cinematic-svg{max-height:49svh}.cinematic-story .story-act h2{font-size:clamp(40px,4vw,61px);margin-bottom:20px}.cinematic-story .story-act>p{font-size:11px}.cinematic-story .cinematic-copy>.eyebrow{margin-bottom:17px}.cinematic-story .story-readout{margin-top:20px;padding-top:15px}.cinematic-story .story-stage-header{padding-top:15px}.cinematic-story .story-bottomline{padding-top:12px;padding-bottom:10px}.story-2.cinematic-story .cinematic-svg{max-height:45svh}.story-2.cinematic-story .story-stage-header{padding-top:27px}.story-2.cinematic-story .story-stage-footer{padding-bottom:25px}.story-3.cinematic-story .cinematic-svg{max-height:35svh;min-height:215px}.story-3.cinematic-story .story-act h2{font-size:40px}.story-3.cinematic-story .story-composition{gap:12px;padding-block:18px}.story-3.cinematic-story .story-readout{margin:0}.story-5.cinematic-story .story-act h2{font-size:62px}}
@@ -251,3 +279,7 @@
 .story.cinematic-story .sequence-playback{letter-spacing:0;text-transform:none}
 @media(max-width:820px){.story.cinematic-story,.story.cinematic-story.static{margin-block:25px 45px}.story.cinematic-story .cinematic-sticky,.story.cinematic-story.static .cinematic-sticky{padding-block:14px}.story.cinematic-story .story-composition,.story.cinematic-story.static .story-composition{padding-block:14px 24px;gap:20px}.story.cinematic-story .cinematic-svg{max-height:min(40svh,330px);min-height:0}.story.cinematic-story .story-bottomline{margin-top:0}}
 @media(max-height:760px) and (min-width:821px){.story.cinematic-story .cinematic-svg{max-height:43svh}.story.cinematic-story .story-act h2{font-size:clamp(36px,3.4vw,54px)}.story.cinematic-story .story-composition{padding-block:10px 20px}.story.cinematic-story .story-readout{margin-top:16px;padding-top:12px}}
+/* Keep the drafting sheet rectangular, and stack its two-column layout on phones. */
+.story-6.cinematic-story.static .story-glass-back{transform:none}
+@media(max-width:820px){.story-6.cinematic-story .story-composition{grid-template-columns:1fr;gap:22px}.story-6.cinematic-story .story-glass-back{border-radius:3px}.story-6.cinematic-story .story-stage-header{padding:16px 18px 10px;font-size:9px}.story-6.cinematic-story .story-stage-footer{margin-inline:18px;font-size:6px;padding-block:10px 12px}.story-6.cinematic-story .cinematic-svg{max-height:min(43svh,380px)}}
+@media(max-width:600px){.story-6.cinematic-story .vector-document-count,.story-6.cinematic-story .vector-grid text,.story-6.cinematic-story .vector-destination>.vector-point-label{font-size:21px}.story-6.cinematic-story .vector-register-heading,.story-6.cinematic-story .vector-axis-heading,.story-6.cinematic-story .vector-comparison>text,.story-6.cinematic-story .vector-caption{font-size:20px;letter-spacing:0}.story-6.cinematic-story .vector-source-word,.story-6.cinematic-story .vector-word text{font-size:22px}}

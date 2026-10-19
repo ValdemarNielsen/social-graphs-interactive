@@ -7,7 +7,6 @@ type Projection = { cy: number; sy: number; cx: number; sx: number; cz: number; 
 const TAU = Math.PI * 2;
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
-const hash = (n: number) => { const value = Math.sin(n * 127.1 + 311.7) * 43758.5453; return value - Math.floor(value); };
 
 /** Perspective projection of actual 3D coordinates. Pointer deformation happens
  * in view space after projection, so the same function bends strands and lights. */
@@ -32,54 +31,25 @@ function project(x: number, y: number, z: number, camera: Projection, out: Float
   out[offset] = px; out[offset + 1] = py; out[offset + 2] = perspective; out[offset + 3] = depth;
 }
 
-function makeGlow(color: string) {
-  const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64;
-  const context = canvas.getContext('2d');
-  if (context) {
-    const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 31);
-    gradient.addColorStop(0, '#fff8e5'); gradient.addColorStop(.12, color);
-    gradient.addColorStop(.35, `${color}80`); gradient.addColorStop(1, `${color}00`);
-    context.fillStyle = gradient; context.fillRect(0, 0, 64, 64);
+/** Continuous locally typeset ink. Each sheet is a solid print, not a dot sample. */
+function wordPlate(word: string, shadow = false) {
+  const plate = document.createElement('canvas'); plate.width = 1440; plate.height = 440;
+  const ink = plate.getContext('2d');
+  if (ink) {
+    ink.font = `500 ${word.length > 5 ? 230 : 300}px "Space Grotesk", sans-serif`;
+    ink.textAlign = 'center'; ink.textBaseline = 'middle';
+    const finish = ink.createLinearGradient(0, 80, 0, 355);
+    finish.addColorStop(0, '#344c91'); finish.addColorStop(.42, '#19366b'); finish.addColorStop(1, '#5873ad');
+    ink.fillStyle = shadow ? '#172746' : finish;
+    ink.fillText(word, 720, 232, 1340);
   }
-  return canvas;
-}
-
-/** Sample the pixels of a locally rendered word, not a downloaded texture. Both
- * targets share a point count, allowing deterministic particle-to-particle flight. */
-function wordSamples(word: string, maximum: number): Float32Array {
-  const canvas = document.createElement('canvas'); canvas.width = 1100; canvas.height = 320;
-  const context = canvas.getContext('2d', { willReadFrequently: true });
-  if (!context) return new Float32Array(0);
-  context.font = `600 ${word.length > 5 ? 185 : 245}px "Space Grotesk", sans-serif`;
-  context.textAlign = 'center'; context.textBaseline = 'middle'; context.fillStyle = '#000';
-  context.fillText(word, 550, 164, 1050);
-  const pixels = context.getImageData(0, 0, 1100, 320).data;
-  const points: number[] = [];
-  let minX = 1100, maxX = 0, minY = 320, maxY = 0;
-  for (let y = 8; y < 312; y += 3) for (let x = 8; x < 1092; x += 3) {
-    if (pixels[(y * 1100 + x) * 4 + 3] > 150) { points.push(x, y); minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
-  }
-  if (!points.length) return new Float32Array(0);
-  const count = Math.min(maximum, points.length / 2);
-  const result = new Float32Array(count * 3);
-  const scale = 620 / Math.max(1, maxX - minX);
-  const available = points.length / 2;
-  // A deterministic shuffle mixes rows without allocating point objects.
-  const order = Array.from({ length: available }, (_, i) => i);
-  for (let i = available - 1; i > 0; i--) { const j = Math.floor(hash(i + word.length * 71) * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-  for (let i = 0; i < count; i++) {
-    const source = order[Math.floor(i * available / count)] * 2;
-    result[i * 3] = (points[source] - (minX + maxX) / 2) * scale;
-    result[i * 3 + 1] = (points[source + 1] - (minY + maxY) / 2) * scale;
-    result[i * 3 + 2] = (hash(i + 85) - .5) * 42;
-  }
-  return result;
+  return plate;
 }
 
 const titles = {
-  1: ['RELATIONSHIP FIELD', 'A knot becomes a constellation.'],
-  3: ['TRANSIT THROUGH POSSIBILITY', 'Follow a route into the unknown.'],
-  5: ['THE MATTER OF LANGUAGE', 'Words dissolve. Another form arrives.'],
+  1: ['THE SHAPE OF A RELATIONSHIP', 'Continuous strands open into a connected form.'],
+  3: ['AN ARCHITECTURE OF ROUTES', 'A continuous passage changes its perspective.'],
+  5: ['LANGUAGE, IN FORM', 'Printed words separate into ribbons and become another word.'],
 };
 
 /** Decorative, original projected-3D scenes. `active` selects the alternate
@@ -98,18 +68,10 @@ export default function ParticleTheatre({ week, reduced, active = false }: Parti
     if (!context) { root.dataset.canvas = 'unavailable'; return; }
     const ctx = context;
     delete root.dataset.canvas;
-    const glows = [makeGlow('#ec5345'), makeGlow('#b7a0ff'), makeGlow('#e8f597'), makeGlow('#2c55d6')];
-    const strandCount = 34, strandSteps = 83;
+    const strandCount = 16, strandSteps = 145;
     const strands = Array.from({ length: strandCount }, () => new Float32Array(strandSteps * 4));
-    const scratch = new Float32Array(12);
-    const maximumParticles = window.innerWidth < 760 ? 1500 : 2500;
-    const particleSeeds = new Float32Array(maximumParticles * 6);
-    for (let i = 0; i < maximumParticles; i++) for (let channel = 0; channel < 6; channel++) particleSeeds[i * 6 + channel] = hash(i + [12, 52, 18, 29, 30, 9][channel]);
-    let wordA = week === 5 ? wordSamples('WORDS', maximumParticles) : new Float32Array(0);
-    let wordB = week === 5 ? wordSamples('LANGUAGE', maximumParticles) : new Float32Array(0);
-    const projected = new Float32Array(maximumParticles * 4);
-    const previous = new Float32Array(maximumParticles * 2); previous.fill(Number.NaN);
-    const order = Array.from({ length: maximumParticles }, (_, i) => i);
+    const scratch = new Float32Array(16);
+    let plates = week === 5 ? [wordPlate('WORDS'), wordPlate('LANGUAGE'), wordPlate('WORDS', true), wordPlate('LANGUAGE', true)] : [];
     const tangent: XYZ = { x: 0, y: 0, z: 0 };
     let width = 1, height = 1, dpr = 1, frame = 0, visible = false, disposed = false, drawnFrames = 0;
     let time = reduced ? 4.7 : 0, lastTime = 0, lastDraw = 0, travel = 250;
@@ -123,13 +85,10 @@ export default function ParticleTheatre({ week, reduced, active = false }: Parti
     function camera(yaw: number, pitch: number, roll: number, scale: number): Projection {
       return { cy: Math.cos(yaw), sy: Math.sin(yaw), cx: Math.cos(pitch), sx: Math.sin(pitch), cz: Math.cos(roll), sz: Math.sin(roll), scale, centerX: width * .5, centerY: height * .49, pointerX: pointer.pixelX, pointerY: pointer.pixelY, influence: pointerStrength };
     }
-    function line(points: Float32Array, count: number, color: string, strokeWidth: number, stride = 4) {
+    function line(points: Float32Array, count: number, color: string | CanvasGradient, strokeWidth: number, stride = 4) {
       ctx.beginPath();
       for (let i = 0; i < count; i++) { const at = i * stride; if (i === 0) ctx.moveTo(points[at], points[at + 1]); else ctx.lineTo(points[at], points[at + 1]); }
       ctx.strokeStyle = color; ctx.lineWidth = strokeWidth; ctx.stroke();
-    }
-    function glow(x: number, y: number, size: number, type: number, opacity = 1) {
-      ctx.globalAlpha = opacity; ctx.drawImage(glows[type], x - size / 2, y - size / 2, size, size); ctx.globalAlpha = 1;
     }
     function pointOnStrand(strand: number, u: number, out: XYZ) {
       const angle = strand / strandCount * TAU;
@@ -150,187 +109,143 @@ export default function ParticleTheatre({ week, reduced, active = false }: Parti
     }
 
     function drawFilaments() {
-      const size = Math.min(width / 520, height / 560);
-      const view = camera(time * .115 + pointer.x * .48, -.32 + pointer.y * .35, -.36 + phase * .25, size * 1.16);
-      // Fine orbit tracks frame the tangled sculpture, while the core remains dense.
-      ctx.globalAlpha = .22; ctx.strokeStyle = '#345c91'; ctx.lineWidth = .65;
-      for (let ring = 0; ring < 3; ring++) {
-        ctx.beginPath();
-        for (let i = 0; i <= 100; i++) {
-          const t = i / 100 * TAU, r = 237 + ring * 7;
-          project(Math.cos(t) * r, Math.sin(t) * r, Math.sin(t * 2) * (22 + ring * 8), view, scratch, 0, .3);
-          if (i === 0) ctx.moveTo(scratch[0], scratch[1]); else ctx.lineTo(scratch[0], scratch[1]);
-        }
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-      const every = quality < .8 ? 2 : 1;
-      for (let strand = 0; strand < strandCount; strand += every) {
-        const points = strands[strand]; let depth = 0;
+      const scale = Math.min(width / 540, height / 540) * 1.12;
+      const view = camera(.45 + Math.sin(time * .09) * .35 + pointer.x * .25, -.24 + pointer.y * .17, -.38 + phase * .17, scale);
+      const sorted: { strand: number; depth: number }[] = [];
+      for (let strand = 0; strand < strandCount; strand++) {
+        let depth = 0;
         for (let i = 0; i < strandSteps; i++) {
           pointOnStrand(strand, i / (strandSteps - 1) * TAU, tangent);
-          project(tangent.x, tangent.y, tangent.z, view, points, i * 4);
-          depth += points[i * 4 + 3];
+          project(tangent.x, tangent.y, tangent.z, view, strands[strand], i * 4, .45);
+          depth += strands[strand][i * 4 + 3];
         }
-        const front = clamp(.6 - depth / strandSteps / 500, .3, .9);
-        const red = strand % 5 < 2;
-        if (strand % 5 === 0) line(points, strandSteps, red ? '#d6442921' : '#36619e18', 7 * size);
+        sorted.push({ strand, depth: depth / strandSteps });
+      }
+      sorted.sort((a, b) => b.depth - a.depth);
+      const copper = ctx.createLinearGradient(width * .25, height * .15, width * .68, height * .75);
+      copper.addColorStop(0, '#e1b99c'); copper.addColorStop(.25, '#9b594a'); copper.addColorStop(.48, '#d49676'); copper.addColorStop(.72, '#713e38'); copper.addColorStop(1, '#c99b7c');
+      const blue = ctx.createLinearGradient(width * .2, height * .1, width * .75, height * .85);
+      blue.addColorStop(0, '#a9b9c6'); blue.addColorStop(.3, '#4c6072'); blue.addColorStop(.6, '#273f56'); blue.addColorStop(1, '#7b929d');
+      for (const { strand, depth } of sorted) {
+        const points = strands[strand], front = clamp(.86 - depth / 600, .45, 1);
         ctx.globalAlpha = front;
-        line(points, strandSteps, red ? '#b9322d' : '#203d68', (strand % 5 === 0 ? 1.3 : .6) * Math.max(.75, size));
-        ctx.globalAlpha = 1;
+        line(points, strandSteps, '#26323e14', 6 * scale);
+        line(points, strandSteps, strand < 5 ? copper : blue, (strand % 4 === 0 ? 2.65 : 1.65) * Math.max(.75, scale));
+        if (strand % 4 === 0) { ctx.globalAlpha = front * .42; line(points, strandSteps, '#fff9e3', .55 * scale); }
       }
-      // Signals share the same parametric strands: they visibly traverse the form.
-      const signals = quality < .8 ? 90 : 150;
-      for (let i = 0; i < signals; i++) {
-        const strand = i * 7 % strandCount;
-        const u = (hash(i + 19) * TAU + time * (.18 + hash(i + 100) * .34) * (i % 2 ? 1 : -1)) % TAU;
-        pointOnStrand(strand, u, tangent); project(tangent.x, tangent.y, tangent.z, view, scratch, 0);
-        pointOnStrand(strand, u - .035, tangent); project(tangent.x, tangent.y, tangent.z, view, scratch, 4);
-        const front = clamp(1.1 - (scratch[3] + 220) / 530, .2, 1);
-        ctx.globalAlpha = front; ctx.strokeStyle = i % 3 ? '#dc5141' : '#264e8b'; ctx.lineWidth = 1.5 * scratch[2] * size;
-        ctx.beginPath(); ctx.moveTo(scratch[4], scratch[5]); ctx.lineTo(scratch[0], scratch[1]); ctx.stroke();
-        ctx.fillStyle = '#f8edd4'; ctx.beginPath(); ctx.arc(scratch[0], scratch[1], Math.max(.65, scratch[2] * size * 1.7), 0, TAU); ctx.fill();
-        ctx.globalAlpha = 1;
-        if (i % 12 === 0) glow(scratch[0], scratch[1], 17 * scratch[2] * size, i % 3 ? 0 : 3, front * .65);
-      }
-      // Six larger focal lights make the overall structure legible at a glance.
+      ctx.globalAlpha = 1;
+      // Six quiet anchors and six travelling inlays replace the scattered lights.
       for (let i = 0; i < 6; i++) {
-        pointOnStrand(i * 5, i / 6 * TAU + .28, tangent); project(tangent.x, tangent.y, tangent.z, view, scratch, 0);
-        const r = (4.2 + (i === 2 ? 3 : 0)) * scratch[2] * size;
-        glow(scratch[0], scratch[1], r * 9, 0, .48);
-        ctx.fillStyle = '#be3e32'; ctx.strokeStyle = '#fff4df'; ctx.lineWidth = 1.6;
-        ctx.beginPath(); ctx.arc(scratch[0], scratch[1], r, 0, TAU); ctx.fill(); ctx.stroke();
-        if (i === 2 || i === 4) {
-          const direction = i === 2 ? 1 : -1;
-          ctx.strokeStyle = '#253e6860'; ctx.lineWidth = .7; ctx.beginPath(); ctx.moveTo(scratch[0] + direction * r * 2, scratch[1]); ctx.lineTo(scratch[0] + direction * 58 * size, scratch[1] - 30 * size); ctx.stroke();
-        }
+        pointOnStrand(i * 2, i / 6 * TAU + .32, tangent); project(tangent.x, tangent.y, tangent.z, view, scratch, 0, .45);
+        const radius = (i === 2 ? 5.4 : 3.7) * scratch[2] * scale;
+        const pearl = ctx.createRadialGradient(scratch[0] - radius * .3, scratch[1] - radius * .4, 0, scratch[0], scratch[1], radius);
+        pearl.addColorStop(0, '#fff5dd'); pearl.addColorStop(.3, '#d5b18e'); pearl.addColorStop(1, '#775c49');
+        ctx.fillStyle = pearl; ctx.strokeStyle = '#fff3da'; ctx.lineWidth = .7;
+        ctx.beginPath(); ctx.arc(scratch[0], scratch[1], Math.max(1.4, radius), 0, TAU); ctx.fill(); ctx.stroke();
+        const u = i / 6 * TAU + time * .14;
+        pointOnStrand(i * 2 + 1, u, tangent); project(tangent.x, tangent.y, tangent.z, view, scratch, 0, .45);
+        pointOnStrand(i * 2 + 1, u - .045, tangent); project(tangent.x, tangent.y, tangent.z, view, scratch, 4, .45);
+        ctx.strokeStyle = '#efe4c8'; ctx.lineWidth = 2 * scale;
+        ctx.beginPath(); ctx.moveTo(scratch[4], scratch[5]); ctx.lineTo(scratch[0], scratch[1]); ctx.stroke();
       }
-      if (burst > .03) {
-        ctx.strokeStyle = `rgba(188,56,44,${burst * .3})`; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.ellipse(width * .5, height * .49, (170 + burstAge * 150) * size, (155 + burstAge * 120) * size, -.25, 0, TAU); ctx.stroke();
-      }
+      ctx.strokeStyle = '#4654662a'; ctx.lineWidth = .7;
+      ctx.beginPath(); ctx.ellipse(width * .5, height * .49 + 219 * scale, 117 * scale, 8 * scale, 0, 0, TAU); ctx.stroke();
     }
 
-    function tunnelPoint(angle: number, z: number, out: Float32Array, offset: number, radiusOffset = 0) {
-      const depth = Math.max(65, z);
-      const bend = depth / 1600;
-      const twist = time * .095 + Math.sin(depth * .0013 + time * .16) * .13 + phase * .8;
-      const radius = (251 + Math.sin(depth * .002 + time * .4) * 24 + phase * 45 + radiusOffset) * (1 + .075 * Math.cos(angle * 6 + phase * 2));
-      const cx = Math.sin(depth * .00115 + time * .14) * 140 * bend + pointer.x * 160 * bend;
-      const cy = Math.cos(depth * .0009 + time * .12) * 80 * bend + pointer.y * 140 * bend;
-      const x = cx + Math.cos(angle + twist) * radius;
-      const y = cy + Math.sin(angle + twist) * radius;
-      const perspective = 470 / depth;
-      const scale = Math.min(width / 660, height / 620);
-      const roll = -.17 + phase * .48 + pointer.x * .12;
-      // On the wide, full-bleed cover the left side holds the title. Keep the
-      // vanishing point in the exposed right field; small screens stay centered.
-      const centerX = width * (width / height > 1.45 ? .7 : .5);
-      out[offset] = centerX + (x * Math.cos(roll) - y * Math.sin(roll)) * perspective * scale;
+    function tunnelPoint(angle: number, z: number, out: Float32Array, offset: number, radialOffset = 0) {
+      const depth = Math.max(100, z), bend = depth / 1900;
+      const twist = .13 * Math.sin(depth * .001 + time * .06) + phase * .5;
+      const radius = 253 + Math.sin(depth * .0015) * 12 + phase * 28 + radialOffset;
+      const x = Math.sin(depth * .001 + time * .055) * 105 * bend + pointer.x * 95 * bend + Math.cos(angle + twist) * radius;
+      const y = Math.cos(depth * .0009 + time * .045) * 48 * bend + pointer.y * 80 * bend + Math.sin(angle + twist) * radius;
+      const perspective = 470 / depth, scale = Math.min(width / 660, height / 620), roll = -.13 + phase * .32;
+      out[offset] = width * (width / height > 1.45 ? .7 : .5) + (x * Math.cos(roll) - y * Math.sin(roll)) * perspective * scale;
       out[offset + 1] = height * .46 + (x * Math.sin(roll) + y * Math.cos(roll)) * perspective * scale;
-      out[offset + 2] = perspective * scale;
-      out[offset + 3] = depth;
+      out[offset + 2] = perspective * scale; out[offset + 3] = depth;
     }
 
     function drawTunnel() {
-      const stride = quality < .8 ? 2 : 1;
-      // The centerline bends through depth, rather than scaling concentric circles.
-      for (let ring = 30; ring >= 0; ring -= stride) {
-        const z = 115 + ring * 99 - (travel % 99);
-        const points = strands[ring % strandCount];
+      // Six continuous ribs, with material gradients and precise edges.
+      for (let rib = 0; rib < 6; rib++) {
+        const angle = rib / 6 * TAU, band = rib % 2 ? .06 : .105, points = strands[rib];
+        ctx.beginPath();
+        for (let side = 0; side < 2; side++) for (let i = 0; i < 110; i++) {
+          const j = side ? 109 - i : i, z = 145 + j / 109 * 2900;
+          tunnelPoint(angle + (side ? band : -band), z, scratch, 0);
+          if (!side && !i) ctx.moveTo(scratch[0], scratch[1]); else ctx.lineTo(scratch[0], scratch[1]);
+        }
+        ctx.closePath();
+        const material = ctx.createLinearGradient(width * .3, height * .1, width * .9, height * .8);
+        material.addColorStop(0, rib % 2 ? '#a8a4bf1f' : '#bfc5b029'); material.addColorStop(.5, '#8b829b14'); material.addColorStop(1, '#d0c3b847');
+        ctx.fillStyle = material; ctx.fill();
+        for (let i = 0; i < strandSteps; i++) tunnelPoint(angle - band, 145 + i / (strandSteps - 1) * 2900, points, i * 4);
+        line(points, strandSteps, rib % 2 ? '#b8a9cc69' : '#d1d5b684', 1.1);
+      }
+      // Widely spaced frames give depth without a dense wire cloud.
+      for (let ring = 12; ring >= 0; ring--) {
+        const z = 180 + ring * 230 - travel % 230, points = strands[ring];
         for (let i = 0; i < strandSteps; i++) tunnelPoint(i / (strandSteps - 1) * TAU, z, points, i * 4);
-        const alpha = clamp(1 - z / 3400, .06, .8);
-        const selected = ring % 5 === 0;
-        ctx.globalAlpha = alpha * (selected ? .95 : .6);
-        if (selected) line(points, strandSteps, phase > .5 ? '#cbdc7970' : '#a088de70', 10 * Math.min(1.6, 470 / z));
-        line(points, strandSteps, selected ? '#e2ed96' : '#b9a8ee', selected ? 2 : 1);
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = clamp(1 - z / 3300, .08, .8);
+        line(points, strandSteps, '#0d132338', 5.5 * Math.min(1.3, 470 / Math.max(150, z)));
+        line(points, strandSteps, ring % 3 ? '#9e9aaf' : '#d3d4bd', ring % 3 ? .8 : 1.45);
       }
-      // Longitudinal rails describe the curved tunnel surface.
-      const railPoints = strands[33];
-      for (let rail = 0; rail < 16; rail += stride) {
-        const angle = rail / 16 * TAU + Math.sin(time * .08) * .08;
-        for (let i = 0; i < strandSteps; i++) tunnelPoint(angle, 95 + i / (strandSteps - 1) * 3100, railPoints, i * 4, rail % 4 === 0 ? -8 : 0);
-        line(railPoints, strandSteps, rail % 4 === 0 ? '#ddea9568' : '#ac96e227', rail % 4 === 0 ? 1.8 : .75);
+      ctx.globalAlpha = 1;
+      for (let i = 0; i < 12; i++) {
+        const angle = i / 6 * TAU, z = 190 + ((i * 253 - travel * 1.3) % 2650 + 2650) % 2650;
+        tunnelPoint(angle, z, scratch, 0, -5); tunnelPoint(angle, z + 38, scratch, 4, -5);
+        ctx.globalAlpha = clamp(1 - z / 3000, .1, .8); ctx.strokeStyle = i % 3 ? '#cec3dd' : '#e3dfba'; ctx.lineWidth = clamp(scratch[2] * 1.7, .65, 3);
+        ctx.beginPath(); ctx.moveTo(scratch[4], scratch[5]); ctx.lineTo(scratch[0], scratch[1]); ctx.stroke();
       }
-      // Perspective streaks approach the camera. Their tails are farther down
-      // the same curved route, so travel remains attached to the tunnel surface.
-      const travelers = quality < .8 ? 120 : 210;
-      for (let i = 0; i < travelers; i++) {
-        const angle = (i % 16) / 16 * TAU + hash(i + 6) * .07;
-        const z = 115 + ((hash(i + 80) * 3000 - travel * (1.1 + hash(i + 9) * .5)) % 3000 + 3000) % 3000;
-        tunnelPoint(angle, z, scratch, 0, -10);
-        tunnelPoint(angle, z + 22 + phase * 55 + 30 * (470 / z), scratch, 4, -10);
-        if (scratch[0] < -70 || scratch[0] > width + 70 || scratch[1] < -70 || scratch[1] > height + 70) continue;
-        const alpha = clamp(1 - z / 3250, .08, .95);
-        ctx.globalAlpha = alpha; ctx.strokeStyle = i % 4 ? '#beabea' : '#e8f3a4'; ctx.lineWidth = clamp(scratch[2] * 2.2, .6, 4.5);
-        ctx.beginPath(); ctx.moveTo(scratch[4], scratch[5]); ctx.lineTo(scratch[0], scratch[1]); ctx.stroke(); ctx.globalAlpha = 1;
-        if (i % 10 === 0) glow(scratch[0], scratch[1], clamp(scratch[2] * 24, 6, 45), i % 4 ? 1 : 2, alpha * .8);
-      }
-      const words = ['TRANSFER', 'OTHER ROUTES', 'EXPRESS'];
-      for (let i = 0; i < 3; i++) {
-        const z = 450 + ((i * 650 + 1250 - travel * .55) % 1850 + 1850) % 1850;
-        tunnelPoint(i * 2.1 + .7, z, scratch, 0, -20);
-        const font = clamp(scratch[2] * 22, 7, 21);
-        ctx.save(); ctx.translate(scratch[0], scratch[1]); ctx.rotate(-.18 + phase * .3);
-        ctx.globalAlpha = clamp(1 - z / 2600, .15, .7); ctx.font = `500 ${font}px "Space Grotesk", sans-serif`; ctx.fillStyle = i === 2 ? '#e8f3a4' : '#bfaee8'; ctx.fillText(words[i], 0, 0); ctx.restore();
-      }
+      ctx.globalAlpha = 1;
     }
 
     function drawTypography() {
-      const countA = wordA.length / 3, countB = wordB.length / 3;
-      if (!countA || !countB) return;
-      const count = Math.floor(Math.min(maximumParticles, Math.max(countA, countB)) * (quality < .8 ? .72 : 1));
-      const scale = Math.min(width / 750, height / 330) * 1.02;
-      const flight = Math.sin(phase * Math.PI);
-      const view = camera(pointer.x * .26 + Math.sin(time * .18) * .11 + flight * .25, -.17 + pointer.y * .2, -.025 + Math.sin(time * .12) * .02, scale);
+      if (plates.length !== 4) return;
+      const scale = Math.min(width / 770, height / 350), flight = Math.max(Math.sin(phase * Math.PI), burst * .7);
+      const view = camera(pointer.x * .12 + flight * .13, -.07 + pointer.y * .12, -.015, scale);
       view.centerY = height * .48;
-      // Three offset drafting planes give the letterform a visible volume.
-      ctx.lineWidth = .6; ctx.strokeStyle = '#264bb41c';
-      for (let plane = -1; plane <= 1; plane++) {
-        const corners = [[-348, -106], [348, -106], [348, 106], [-348, 106], [-348, -106]];
-        ctx.beginPath(); corners.forEach(([x, y], i) => { project(x, y, plane * 63, view, scratch, 0, 0); if (i) ctx.lineTo(scratch[0], scratch[1]); else ctx.moveTo(scratch[0], scratch[1]); }); ctx.stroke();
+      const slices = 12, stripHeight = 220 / slices;
+      const change = clamp((phase - .27) / .46, 0, 1), blend = change * change * (3 - 2 * change);
+      if (flight < .002) {
+        // At rest, one projected sheet and one image have no internal raster edges.
+        project(-360, -110, 0, view, scratch, 0, 0);
+        project(360, -110, 0, view, scratch, 4, 0);
+        project(-360, 110, 0, view, scratch, 8, 0);
+        ctx.save();
+        ctx.transform((scratch[4] - scratch[0]) / 720, (scratch[5] - scratch[1]) / 720, (scratch[8] - scratch[0]) / 220, (scratch[9] - scratch[1]) / 220, scratch[0], scratch[1]);
+        const paper = ctx.createLinearGradient(0, 0, 0, 220);
+        paper.addColorStop(0, '#f8f2e2'); paper.addColorStop(.76, '#f0e9d9'); paper.addColorStop(1, '#e8e0cd');
+        ctx.globalAlpha = 1; ctx.fillStyle = paper; ctx.fillRect(0, 0, 720, 220);
+        ctx.drawImage(plates[phase > .5 ? 1 : 0], 0, 0, 1440, 440, 0, 0, 720, 220);
+        ctx.restore();
+      } else for (let i = 0; i < slices; i++) {
+        const y = -110 + i * stripHeight, shift = (i % 2 ? 1 : -1) * flight * (20 + i * 3.5);
+        const lift = Math.sin(i * .68) * flight * 115, spreadY = (i - 5.5) * flight * 8;
+        project(-360 + shift, y + spreadY, lift, view, scratch, 0, 0);
+        project(360 + shift, y + spreadY + flight * (i - 5.5) * 1.8, lift + flight * 26, view, scratch, 4, 0);
+        project(-360 + shift, y + stripHeight + spreadY, lift, view, scratch, 8, 0);
+        ctx.save();
+        ctx.transform((scratch[4] - scratch[0]) / 720, (scratch[5] - scratch[1]) / 720, (scratch[8] - scratch[0]) / stripHeight, (scratch[9] - scratch[1]) / stripHeight, scratch[0], scratch[1]);
+        // Sample one continuous paper gradient across all strips. Separate edges
+        // and cast shadows emerge only while the sheet is being peeled apart.
+        const paper = ctx.createLinearGradient(0, -i * stripHeight, 0, 220 - i * stripHeight);
+        paper.addColorStop(0, '#f8f2e2'); paper.addColorStop(.76, '#f0e9d9'); paper.addColorStop(1, '#e8e0cd');
+        ctx.globalAlpha = flight * .32; ctx.fillStyle = '#29364e'; ctx.fillRect(3, 4 + flight * 4, 720, stripHeight);
+        ctx.globalAlpha = 1; ctx.fillStyle = paper; ctx.fillRect(0, 0, 720, stripHeight + .35);
+        const sourceY = i * 440 / slices, sourceHeight = 440 / slices + .6;
+        const stamp = (texture: HTMLCanvasElement, alpha: number, extrusion: boolean) => {
+          if (alpha < .001) return;
+          ctx.globalAlpha = alpha * (extrusion ? .12 * flight : 1);
+          ctx.drawImage(texture, 0, sourceY, 1440, sourceHeight, extrusion ? 1.4 : 0, extrusion ? 2 : 0, 720, stripHeight + .3);
+        };
+        stamp(plates[2], 1 - blend, true); stamp(plates[3], blend, true);
+        stamp(plates[0], 1 - blend, false); stamp(plates[1], blend, false);
+        ctx.restore();
       }
-      for (let i = 0; i < count; i++) {
-        const ia = i % countA * 3, ib = i % countB * 3;
-        const seed = i * 6;
-        const angle = particleSeeds[seed] * TAU + time * .25;
-        const energy = flight * (.6 + particleSeeds[seed + 1] * .6) + burst * .5;
-        const spiral = angle + energy * (particleSeeds[seed + 2] > .5 ? 2.6 : -2.6);
-        const x = mix(wordA[ia], wordB[ib], phase) + Math.cos(spiral) * energy * (80 + particleSeeds[seed + 3] * 180);
-        const y = mix(wordA[ia + 1], wordB[ib + 1], phase) + Math.sin(spiral) * energy * (80 + particleSeeds[seed + 4] * 120);
-        const z = mix(wordA[ia + 2], wordB[ib + 2], phase) + Math.sin(angle * 3 + phase * TAU) * energy * 290 + Math.sin(time * .7 + i * .13) * 3;
-        project(x, y, z, view, projected, i * 4, 1.8);
-      }
-      // A real depth sort gives front particles priority over distant ink dust.
-      if (order.length !== count) { order.length = count; for (let i = 0; i < count; i++) order[i] = i; }
-      order.sort((a, b) => projected[b * 4 + 3] - projected[a * 4 + 3]);
-      if (!reduced && (flight > .03 || burst > .03)) {
-        ctx.strokeStyle = '#b945322d'; ctx.lineWidth = .7; ctx.beginPath();
-        for (let i = 0; i < count; i += 3) {
-          const x = projected[i * 4], y = projected[i * 4 + 1], lastX = previous[i * 2], lastY = previous[i * 2 + 1];
-          if (Number.isFinite(lastX) && Math.hypot(x - lastX, y - lastY) < 90) { ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); }
-        }
-        ctx.stroke();
-      }
-      const inkColors = ['#6e82bc', '#b84d3e', '#254ab3', '#172f80'];
-      for (let layer = 0; layer < 4; layer++) {
-        ctx.fillStyle = inkColors[layer]; ctx.beginPath();
-        for (let at = 0; at < order.length; at++) {
-          const i = order[at], offset = i * 4, depth = projected[offset + 3];
-          const color = depth > 45 ? 0 : i % 11 === 0 ? 1 : depth > -4 ? 2 : 3;
-          if (color !== layer) continue;
-          const radius = clamp((1.35 + particleSeeds[i * 6 + 5] * .5) * projected[offset + 2] * scale, .65, 4);
-          ctx.rect(projected[offset] - radius, projected[offset + 1] - radius, radius * 2, radius * 2);
-        }
-        ctx.fill();
-      }
-      for (let i = 0; i < count; i++) { previous[i * 2] = projected[i * 4]; previous[i * 2 + 1] = projected[i * 4 + 1]; }
-      // Large optical registration marks anchor the scene on its paper surface.
-      ctx.strokeStyle = '#b64a3b80'; ctx.lineWidth = 1;
+      ctx.globalAlpha = 1; ctx.strokeStyle = '#314c8236'; ctx.lineWidth = .7;
       for (const side of [-1, 1]) {
-        const x = width * .5 + side * 335 * scale, y = height * .48;
-        ctx.beginPath(); ctx.moveTo(x - 9, y); ctx.lineTo(x + 9, y); ctx.moveTo(x, y - 9); ctx.lineTo(x, y + 9); ctx.stroke();
+        const x = width * .5 + side * 374 * scale, y = height * .48;
+        ctx.beginPath(); ctx.moveTo(x, y - 91 * scale); ctx.lineTo(x, y + 91 * scale); ctx.moveTo(x - side * 12, y - 91 * scale); ctx.lineTo(x, y - 91 * scale); ctx.stroke();
       }
     }
 
@@ -343,11 +258,11 @@ export default function ParticleTheatre({ week, reduced, active = false }: Parti
       const started = performance.now();
       const dt = !firstPaint && lastTime ? Math.min((now - lastTime) / 1000, .05) : 0;
       lastTime = now; lastDraw = now;
-      if (activeRef.current !== previousActive) { previousActive = activeRef.current; burstAge = 0; previous.fill(Number.NaN); }
+      if (activeRef.current !== previousActive) { previousActive = activeRef.current; burstAge = 0; }
       const target = activeRef.current ? 1 : 0;
       if (reduced) { phase = target; burst = 0; pointerStrength = 0; }
       else {
-        time += dt; travel += dt * (380 + phase * 740);
+        time += dt; travel += dt * (72 + phase * 48);
         phase += (target - phase) * (1 - Math.exp(-dt * 2.8));
         if (Math.abs(target - phase) < .0002) phase = target;
         burstAge += dt; burst = burstAge < 2 ? Math.sin(Math.min(1, burstAge / .26) * Math.PI / 2) * Math.exp(-burstAge * 2.7) : 0;
@@ -386,10 +301,9 @@ export default function ParticleTheatre({ week, reduced, active = false }: Parti
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const centerX = width * (week === 3 && width / height > 1.45 ? .7 : .5);
       background = ctx.createRadialGradient(centerX, height * .46, 0, centerX, height * .49, Math.max(width, height) * .63);
-      if (week === 3) { background.addColorStop(0, '#4b376b70'); background.addColorStop(.42, '#30243c25'); background.addColorStop(1, '#16132100'); }
-      else if (week === 1) { background.addColorStop(0, '#fcf0cf30'); background.addColorStop(.4, '#d8924930'); background.addColorStop(1, '#efe7d200'); }
-      else { background.addColorStop(0, '#c7c4d51a'); background.addColorStop(.6, '#f3eedf00'); background.addColorStop(1, '#f3eedf00'); }
-      previous.fill(Number.NaN);
+      if (week === 3) { background.addColorStop(0, '#54485c36'); background.addColorStop(.55, '#29253b13'); background.addColorStop(1, '#16132100'); }
+      else if (week === 1) { background.addColorStop(0, '#fff4db27'); background.addColorStop(.5, '#c9b59816'); background.addColorStop(1, '#efe7d200'); }
+      else { background.addColorStop(0, '#e6e1d626'); background.addColorStop(1, '#f3eedf00'); }
       // Canvas resizing erases its bitmap. Paint one complete frame immediately,
       // even before IO or visibility events; only the animation loop is gated.
       cancelAnimationFrame(frame); frame = 0; render(performance.now(), true);
@@ -416,9 +330,9 @@ export default function ParticleTheatre({ week, reduced, active = false }: Parti
     canvas.addEventListener('pointerdown', press, { passive: true });
     document.addEventListener('visibilitychange', visibility);
     wakeRef.current = wake;
-    if (week === 5) void document.fonts.load('600 180px "Space Grotesk"').then(() => {
+    if (week === 5) void document.fonts.load('500 230px "Space Grotesk"').then(() => {
       if (disposed) return;
-      wordA = wordSamples('WORDS', maximumParticles); wordB = wordSamples('LANGUAGE', maximumParticles); previous.fill(Number.NaN); wake();
+      plates = [wordPlate('WORDS'), wordPlate('LANGUAGE'), wordPlate('WORDS', true), wordPlate('LANGUAGE', true)]; wake();
     }).catch(() => { /* The system-font sample remains a valid local fallback. */ });
     return () => {
       disposed = true; wakeRef.current = null; cancelAnimationFrame(frame);
@@ -433,7 +347,7 @@ export default function ParticleTheatre({ week, reduced, active = false }: Parti
   return <div ref={rootRef} className={`particle-theatre particle-theatre-${week}`} data-reduced={reduced} data-active={active} role="img" aria-label={`${titles[week][0]}. ${titles[week][1]} An illustrative 3D composition, not measured course data.`}>
     <canvas ref={canvasRef} aria-hidden="true" />
     <div className="pt-fallback" aria-hidden="true">{week === 5 ? 'WORDS' : week === 3 ? '↗' : '✳'}</div>
-    <div className="pt-caption" aria-hidden="true"><span>{titles[week][0]}</span><span>{week === 5 ? active ? 'LANGUAGE / PARTICLE FORM' : 'WORDS / PARTICLE FORM' : active ? 'ALTERNATE PERSPECTIVE' : 'FOLLOW THE CONNECTIONS'}</span></div>
-    {!reduced && <span className="pt-pointer-cue" aria-hidden="true">MOVE THROUGH THE FIELD <i>↗</i></span>}
+    <div className="pt-caption" aria-hidden="true"><span>{titles[week][0]}</span><span>{week === 5 ? active ? 'LANGUAGE / PRINTED FORM' : 'WORDS / PRINTED FORM' : active ? 'ANOTHER PERSPECTIVE' : 'FORM / RELATIONSHIP'}</span></div>
+    {!reduced && <span className="pt-pointer-cue" aria-hidden="true">CHANGE THE PERSPECTIVE <i>↗</i></span>}
   </div>;
 }
