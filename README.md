@@ -4,9 +4,9 @@ A standalone React, TypeScript and Vite learning companion to [Sune Lehmann’s 
 
 The home scene uses an original SVG Spider-Man drawing to pull connected typography. Chapters develop separate comic, machine, transit, atlas, letterpress and celestial identities. Week 6 includes an original WebGL glass sculpture: custom raymarching with approximate optical effects, not physically validated glass simulation or a visualization of learned word vectors.
 
-This project is intended for its own repository, **`ValdemarNielsen/social-graphs-interactive`**, with its own GitHub Pages deployment. It does not require or modify another project.
+This project lives in its own repository, **[ValdemarNielsen/social-graphs-interactive](https://github.com/ValdemarNielsen/social-graphs-interactive)**, with its own GitHub Pages deployment. It does not require or modify another project.
 
-Expected address **after a successful Pages deployment**: [valdemarnielsen.github.io/social-graphs-interactive](https://valdemarnielsen.github.io/social-graphs-interactive/). This expected address is not a claim that deployment has completed.
+**Live website:** [valdemarnielsen.github.io/social-graphs-interactive](https://valdemarnielsen.github.io/social-graphs-interactive/). The initial build and deployment succeeded on 19 October 2026; all six public chapter routes were checked in the browser.
 
 ## Run locally
 

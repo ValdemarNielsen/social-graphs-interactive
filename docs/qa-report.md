@@ -55,4 +55,10 @@ The final build passed, and all **13 calculation tests** passed. The main JavaSc
 
 This pass does not claim a screen-reader audit.
 
-The final home character scene was inspected at 1440 × 960. Scrolling to progress 0.769 produced the hanging typography, including a 53 px sag in the middle letters; reversing to 0.157 restored their original transforms. A keyboard Enter replay in a fresh preview tab completed at progress 1.000 after 262 rendered frames. A screenshot was saved locally as `qa/hero-desktop.jpg`. An older inspection tab had stale animation timing; the fresh-tab replay completed normally. Deployment confirmation is recorded separately below when available.
+The final home character scene was inspected at 1440 × 960. Scrolling to progress 0.769 produced the hanging typography, including a 53 px sag in the middle letters; reversing to 0.157 restored their original transforms. A keyboard Enter replay in a fresh preview tab completed at progress 1.000 after 262 rendered frames. A screenshot was saved locally as `qa/hero-desktop.jpg`. An older inspection tab had stale animation timing; the fresh-tab replay completed normally.
+
+## Public deployment
+
+The standalone repository is [ValdemarNielsen/social-graphs-interactive](https://github.com/ValdemarNielsen/social-graphs-interactive). The initial [GitHub Actions run](https://github.com/ValdemarNielsen/social-graphs-interactive/actions/runs/39305578765) completed both build and deploy successfully for commit `24056c6`.
+
+The [live site](https://valdemarnielsen.github.io/social-graphs-interactive/) was opened on 19 October 2026. All six chapter routes rendered their distinct headings and both interactive episodes. The week 1 graph laboratory loaded; keyboard Space added A–F and the F–A matrix cell updated symmetrically. A direct week 6 link survived refresh, rendered its WebGL canvas without the fallback, and loaded its chapter content. The fresh live tab reported no console errors or warnings during these checks. Local calculations and the broader visual checks above complement these deployment smoke checks.
