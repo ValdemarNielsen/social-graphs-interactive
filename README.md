@@ -2,7 +2,7 @@
 
 A standalone React, TypeScript and Vite learning companion to [Sune Lehmann’s 2026 Social Graphs and Interactions course, DTU 02805](https://sunelehmann.com/socialgraphs2026-web/index.html#weeks). Six independent chapter pages combine live mathematical experiments, study notes and exercise briefs with **six distinct chapter covers, six scroll stories and twelve interactive visual episodes**.
 
-The home scene uses an original SVG Spider-Man drawing to pull connected typography. Chapters develop separate comic, machine, transit, atlas, letterpress and celestial identities. Week 6 includes an original WebGL glass sculpture: custom raymarching with approximate optical effects, not physically validated glass simulation or a visualization of learned word vectors.
+The home scene uses an original SVG Spider-Man drawing to pull connected typography, with a smoothed scroll playhead and spring motion. The chapter openings now include a woven three-dimensional filament knot, an exploding chrome mechanism, a bending transit tunnel, merging iridescent liquid forms, particle typography, and the original week 6 glass sculpture. Canvas scenes use perspective projection; the chrome, liquid and glass use custom WebGL raymarching. These are illustrative compositions with approximate optical effects, not measured networks or physically validated optical simulations.
 
 This project lives in its own repository, **[ValdemarNielsen/social-graphs-interactive](https://github.com/ValdemarNielsen/social-graphs-interactive)**, with its own GitHub Pages deployment. It does not require or modify another project.
 
@@ -82,6 +82,8 @@ src/content-language.ts      Weeks 4–6 learning content
 src/HeroExperience.tsx       Original Spider-Man SVG and connected-type interaction
 src/ChapterCover.tsx         Six chapter-specific cover compositions
 src/GlassSculpture.tsx       Custom WebGL raymarching sculpture and fallback
+src/MatterSculpture.tsx      Chrome mechanism and iridescent liquid raymarching
+src/ParticleTheatre.tsx      Projected filament, transit and typography scenes
 src/Visuals.tsx              Six GSAP/SVG scroll stories and diagram previews
 src/ChapterInterlude.tsx     Twelve distinct interactive teaching episodes
 src/MotionAtmosphere.tsx     Editorial entrances, preview tilt and scroll accents

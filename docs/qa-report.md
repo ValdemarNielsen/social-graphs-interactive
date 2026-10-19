@@ -62,3 +62,18 @@ The final home character scene was inspected at 1440 × 960. Scrolling to progre
 The standalone repository is [ValdemarNielsen/social-graphs-interactive](https://github.com/ValdemarNielsen/social-graphs-interactive). The initial [GitHub Actions run](https://github.com/ValdemarNielsen/social-graphs-interactive/actions/runs/39305578765) completed both build and deploy successfully for commit `24056c6`.
 
 The [live site](https://valdemarnielsen.github.io/social-graphs-interactive/) was opened on 19 October 2026. All six chapter routes rendered their distinct headings and both interactive episodes. The week 1 graph laboratory loaded; keyboard Space added A–F and the F–A matrix cell updated symmetrically. A direct week 6 link survived refresh, rendered its WebGL canvas without the fallback, and loaded its chapter content. The fresh live tab reported no console errors or warnings during these checks. Local calculations and the broader visual checks above complement these deployment smoke checks.
+
+## Sculptural revision QA — 19 October 2026
+
+This is a second visual pass responding to the opening scroll stutter and requests for more elaborate, varied animation. It supersedes the original cover descriptions above, while preserving the course calculations.
+
+- In-browser desktop review confirmed all five new cover scenes render: filament knot, chrome mechanism, transit tunnel, pearl liquid and particle type. All five direct controls were exercised. Week 5 visibly reassembled WORDS into LANGUAGE.
+- The home playhead moved to 0.417, reversed to 0.148, and an independent replay completed at 1.000 with its loop stopped. Intermediate and peak poses were inspected. The final composition was checked at 1440×900 and 1280×720; the shorter layout had no horizontal page overflow.
+- An initially blank tunnel was repaired with immediate first-paint/resize rendering and a vanishing point in the unobscured side. The browser then confirmed visible rings and signals, advancing canvas-frame markers, alternate state, and an offscreen pause when scrolling into the story.
+- The week 3 story was scrolled into its final act. Its front plane settled to an ordinary zero-offset transform, keeping the numerical diagram readable. Cover rendering stopped offscreen.
+- The production build verified still-mode liquid and immediate alternate particle compositions for weeks 1 and 5. Story components remount on motion changes to prevent animation cleanup from overwriting static final geometry. Week 6 retained a working WebGL canvas with no fallback. No console warnings or errors were recorded in this production check.
+- A visual-only error boundary now contains rejected lazy sculpture imports. That recovery path was inspected in code, not induced by browser network fault injection.
+
+A 19-second production sample of the final week 4 liquid scene at 1440×900 recorded 779 animation-frame intervals: median 16.8 ms, p95 33.5 ms, 11 above 50 ms, CLS 0, LCP 1140 ms and 3 long tasks. This is one instrumented browser sample, not a promise of device-independent frame rate. No new physical-device or screen-reader audit was performed.
+
+All 13 calculation tests passed and the final TypeScript/production build passed. The main JavaScript bundle is 565.78 kB (192.96 kB gzip); new sculpture modules load separately. The existing bundler size advisory still applies. The numerical laboratories were not changed in this revision.

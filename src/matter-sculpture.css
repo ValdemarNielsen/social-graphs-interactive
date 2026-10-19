@@ -1,0 +1,28 @@
+.matter-sculpture{position:relative;width:100%;height:100%;isolation:isolate;overflow:hidden;--matter-ink:#ffab76;--matter-faint:#ff9a5833}
+.matter-sculpture.matter-4{--matter-ink:#3f624d;--matter-faint:#3f624d30}
+.matter-sculpture .matter-canvas{display:block;position:absolute;inset:0;width:100%;height:100%;z-index:2;cursor:grab;touch-action:pan-y}
+.matter-sculpture .matter-canvas:active{cursor:grabbing}
+.matter-sculpture.matter-still .matter-canvas{cursor:default}
+.matter-sculpture .matter-atmosphere{position:absolute;inset:10% 0;z-index:0;background:radial-gradient(ellipse at 50% 47%,#ff70250e,transparent 52%),radial-gradient(ellipse at 54% 49%,#5c91b211,transparent 68%);pointer-events:none}
+.matter-sculpture.matter-4 .matter-atmosphere{background:radial-gradient(ellipse at 50% 49%,#a7b7a226,transparent 64%),radial-gradient(ellipse at 64% 31%,#f7e4d94a,transparent 45%)}
+.matter-sculpture .matter-orbit{position:absolute;z-index:1;pointer-events:none;border:1px solid var(--matter-faint);border-radius:50%;left:14%;right:14%;top:26%;bottom:24%;opacity:.65}
+.matter-sculpture .matter-orbit-one{transform:rotate(-33deg) scaleY(.58)}
+.matter-sculpture .matter-orbit-two{transform:rotate(47deg) scaleY(.39);border-style:dashed;opacity:.3;inset:21% 16%}
+.matter-sculpture.matter-4 .matter-orbit-one{inset:22% 15%;transform:rotate(-24deg) scaleY(.77);border-width:1px}
+.matter-sculpture.matter-4 .matter-orbit-two{transform:rotate(37deg) scaleY(.64);inset:17% 19%;border-style:solid;opacity:.2}
+.matter-sculpture .matter-notations{position:absolute;inset:0;z-index:3;pointer-events:none;font:8px/1.6 var(--display);letter-spacing:.15em;color:var(--matter-ink)}
+.matter-sculpture .matter-notations>span{position:absolute;max-width:200px}
+.matter-sculpture .matter-notations>span:first-child{top:15%;left:13%;padding-left:12px;border-left:1px solid var(--matter-faint)}
+.matter-sculpture .matter-notations>span:nth-child(2){right:9%;bottom:25%;writing-mode:vertical-rl;font-size:7px;letter-spacing:.19em}
+.matter-sculpture .matter-notations>span:last-child{left:18%;bottom:13%;font-size:6px;letter-spacing:.13em;opacity:.7}
+.matter-sculpture.matter-4 .matter-notations>span:first-child{top:16%;left:12%;font:italic 18px var(--serif);letter-spacing:0;padding-left:0;border-left:0}
+.matter-sculpture.matter-4 .matter-notations>span:nth-child(2){bottom:22%;right:10%}
+.matter-sculpture.matter-unavailable .matter-canvas{opacity:0;pointer-events:none}
+.matter-sculpture .matter-fallback{position:absolute;inset:20% 19%;z-index:2;perspective:900px;transform:rotate(-15deg);filter:drop-shadow(0 30px 25px #0002)}
+.matter-sculpture .matter-fallback>span{position:absolute;width:25%;aspect-ratio:1;background:linear-gradient(140deg,#f8e3c4 0%,#4d6474 22%,#161c26 43%,#b5c9cd 66%,#334b5b 79%,#f49c57);border:1px solid #d6e1de66;border-radius:16%;box-shadow:inset 2px 3px 3px #fff6,8px 9px 16px #0004;transform:rotate(calc(var(--part)*11deg))}
+.matter-sculpture .matter-fallback-core{position:absolute;inset:35%;border-radius:50%;background:radial-gradient(circle at 32% 27%,#ffefa2,#ff8e28 20%,#c63c0f 70%);box-shadow:0 0 45px #fb752578}
+.matter-sculpture.matter-4 .matter-fallback{inset:23% 23%;transform:rotate(-25deg);filter:drop-shadow(15px 30px 25px #3a513b25)}
+.matter-sculpture.matter-4 .matter-fallback>span{width:49%;border:1px solid #fbfff488;border-radius:50%;background:radial-gradient(ellipse at 28% 22%,#fffdec 2%,#e9efdf 10%,#90a68a 24%,#4c665951 47%,#667b6244 64%,#ded9b3 76%,#b8b7b9);box-shadow:inset 5px 8px 9px #fffffba3,inset -9px -6px 13px #48604e44}
+.matter-sculpture.matter-4 .matter-fallback-core{display:none}
+@media(max-width:1100px){.matter-sculpture .matter-notations>span:first-child{left:11%;font-size:7px}.matter-sculpture .matter-notations>span:last-child{left:14%;font-size:6px}.matter-sculpture.matter-4 .matter-notations>span:first-child{font-size:16px}}
+@media(max-width:760px){.matter-sculpture .matter-notations>span:first-child{top:10%;left:9%;font-size:7px}.matter-sculpture .matter-notations>span:nth-child(2){right:5%;bottom:21%;font-size:6px}.matter-sculpture .matter-notations>span:last-child{left:12%;bottom:9%;font-size:5px}.matter-sculpture.matter-4 .matter-notations>span:first-child{font-size:17px;top:11%;left:10%}.matter-sculpture .matter-orbit-one{inset:25% 10%}.matter-sculpture .matter-orbit-two{inset:24% 13%}}

@@ -228,3 +228,16 @@
 .story.cinematic-story.static .story-progress-fill{transform:scaleX(1)}
 @media(max-width:820px){.story.cinematic-story.static .cinematic-sticky{min-height:0}.story.cinematic-story.static .story-composition{padding-block:35px}.story.cinematic-story.static .cinematic-svg{max-height:none;min-height:220px}.story.cinematic-story.static .story-bottomline{margin-top:20px}}
 @media(prefers-reduced-motion:reduce){.cinematic-story .story-act,.cinematic-story .story-acts>div{transition:none}}
+
+/* Spatial approach shots resolve to a flat, accurate reading plane. */
+.cinematic-story .story-stage-perspective{perspective:1500px;transform-style:preserve-3d}
+.cinematic-story .story-glass-front{transform-style:preserve-3d;backface-visibility:hidden}
+.story-orbit-cage{position:absolute;inset:-10% -12%;transform-style:preserve-3d;pointer-events:none;z-index:-1}
+.story-orbit-cage i{position:absolute;inset:0;border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-radius:50%;transform:rotateX(58deg) rotateY(-18deg);box-shadow:0 0 30px color-mix(in srgb,var(--accent) 8%,transparent)}
+.story-orbit-cage i:nth-child(2){inset:8%;transform:rotateX(-35deg) rotateY(62deg);border-width:2px;border-color:color-mix(in srgb,var(--secondary) 35%,transparent)}
+.story-orbit-cage i:nth-child(3){inset:-5%;transform:rotateX(75deg) rotateY(32deg);border-style:dashed}
+.story-orbit-cage i:nth-child(4){inset:16%;transform:rotateX(28deg) rotateY(-65deg)}
+.story-3 .story-orbit-cage{inset:-35% 3%;opacity:.35}
+.story-3 .story-orbit-cage i{border-radius:32%;border-color:#a69cdf33}
+.story.static .story-orbit-cage{display:none}
+@media(max-width:820px){.story-orbit-cage{display:none}}

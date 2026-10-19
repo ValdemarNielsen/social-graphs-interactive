@@ -20,3 +20,50 @@ body.theme-blue,.chapter-page.theme-blue{--bg:#0e1025;--panel:#171a35;--text:#e9
 @media(min-width:1100px){.cover-4 .cover-type{grid-column:2;margin-left:4%;}.cover-4 .cover-artboard{left:0;right:auto;width:52%}.cover-4 .cover-edition{left:auto;right:5%}.cover-4 .cover-question{grid-template-columns:1fr 1.7fr}.cover-5 .cover-stage{min-height:820px;display:block}.cover-5 .cover-type{text-align:center;position:relative;width:100%;margin-top:0}.chapter-cover.cover-5 h1{font-size:7.7vw;white-space:nowrap}.cover-5 h1>span{display:inline}.cover-5 h1>span+span:before{content:' '}.cover-5 .cover-kicker{margin:0 auto 20px}.cover-5 .cover-deck{max-width:100%;margin:18px auto}.cover-5 .cover-direct{justify-content:center;margin-top:12px}.cover-5 .cover-artboard{width:100%;height:430px;right:0;top:auto;bottom:0;transform:rotate(-3deg)}.cover-5 .cover-edition{display:none}.cover-5 .cover-art-label{transform:rotate(3deg);bottom:7px;right:5%}}
 .glass-fallback canvas{display:none}
 .story.cinematic-story{overflow-x:clip}
+
+/* Sculptures occupy the composition, with room for depth and pointer play. */
+.sculptural-cover .cover-stage{min-height:660px;height:calc(100svh - 205px);max-height:1000px}
+.sculptural-cover .cover-artboard{width:62%;right:-5%;transform:none;border:0;overflow:hidden}
+.sculptural-cover .cover-type{max-width:100%}
+.sculptural-cover .cover-art-caption{position:absolute;top:5%;left:14%;right:12%;display:flex;flex-direction:column;gap:8px;pointer-events:none;font:8px/1.5 var(--display);letter-spacing:.16em;color:var(--muted)}
+.sculptural-cover .cover-art-caption strong{font-size:10px;font-weight:500;color:var(--accent)}
+.sculptural-cover .cover-art-caption>span:last-child{display:none}
+.cover-live-status{font:9px/1.6 var(--display);color:var(--muted);min-height:29px;max-width:330px;margin:12px 0 0}
+.cover-loading-orbit{position:absolute;inset:28%;border:1px solid var(--accent);border-radius:50%;transform:rotate(-25deg) scaleY(.7);opacity:.2;box-shadow:0 0 80px color-mix(in srgb,var(--accent) 18%,transparent)}
+.sculptural-cover.cover-1 .cover-artboard{right:-6%;width:62%}
+.sculptural-cover.cover-1 .cover-art-caption{left:19%}
+.sculptural-cover.cover-2 .cover-stage{background:radial-gradient(ellipse at 79% 51%,#5c36182e,transparent 55%),#111820}
+.sculptural-cover.cover-2 .cover-artboard{width:63%;right:-4%}
+.sculptural-cover.cover-3 .cover-stage{background:#100e21}
+.sculptural-cover.cover-3 .cover-artboard{width:100%;right:0;isolation:isolate}
+.sculptural-cover.cover-3 .cover-artboard:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#100e21 2%,#100e21ef 18%,#100e2144 55%,transparent 75%);pointer-events:none;z-index:1}
+.sculptural-cover.cover-3 .cover-art-caption{left:57%;z-index:2}
+.sculptural-cover.cover-3 .cover-art-label{z-index:2}
+.sculptural-cover.cover-3 .cover-type{max-width:none}
+.sculptural-cover.cover-4 .cover-stage{background:radial-gradient(ellipse at 24% 60%,#c4d0ba55,transparent 55%)}
+.sculptural-cover.cover-4 .cover-art-caption{left:16%}
+.sculptural-cover.cover-5 .cover-artboard{transform:none}
+.sculptural-cover.cover-5 .cover-art-caption{left:6%;right:6%;top:8%}
+.sculptural-cover.cover-5 .cover-art-label{transform:none}
+.sculptural-cover.cover-5 .cover-live-status{margin:8px auto 0;max-width:none}
+.sculptural-cover.cover-6 .cover-art-caption{display:none}
+@media(min-width:1100px){
+ .sculptural-cover.cover-4 .cover-artboard{left:-6%;right:auto;width:65%}
+ .sculptural-cover.cover-4 .matter-notations>span:first-child{left:16%}
+ .sculptural-cover.cover-4 .cover-type{grid-column:2;margin-left:7%}
+ .sculptural-cover.cover-5 .cover-stage{height:calc(100svh - 205px);min-height:690px;padding-top:24px}
+ .sculptural-cover.cover-5 .cover-artboard{height:400px;width:100%;right:0;top:auto;bottom:0}
+ .sculptural-cover.cover-5 h1{font-size:6.5vw}
+}
+@media(max-width:1099px) and (min-width:761px){.sculptural-cover .cover-artboard{opacity:1;width:65%;right:-10%}.sculptural-cover.cover-3 .cover-artboard{width:100%;right:0}.sculptural-cover .cover-stage{min-height:610px}.sculptural-cover .cover-art-caption{display:none}}
+@media(max-width:760px){
+ .sculptural-cover .cover-stage{height:auto;max-height:none;min-height:880px;padding-bottom:430px}
+ .sculptural-cover .cover-artboard,.sculptural-cover.cover-1 .cover-artboard,.sculptural-cover.cover-2 .cover-artboard,.sculptural-cover.cover-3 .cover-artboard,.sculptural-cover.cover-4 .cover-artboard{width:100%;height:430px;right:0;left:0;top:auto;bottom:0;opacity:1}
+ .sculptural-cover.cover-3 .cover-artboard:after{background:linear-gradient(#100e21,transparent 30%)}
+ .sculptural-cover.cover-3 .cover-type{max-width:none}
+ .sculptural-cover .cover-art-caption{top:7%;left:7%;right:7%}
+ .sculptural-cover .cover-art-caption strong{font-size:8px}
+ .sculptural-cover .cover-art-caption>span:last-child{display:none}
+ .sculptural-cover .cover-art-label{font-size:5.5px;bottom:15px;right:7%}
+ .sculptural-cover .cover-live-status{font-size:8px;min-height:25px}
+}

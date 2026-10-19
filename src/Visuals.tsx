@@ -185,13 +185,22 @@ export function Story({week,reduced}:{week:number;reduced:boolean}){
   const context=gsap.context(()=>{
    const q=(selector:string)=>el.querySelectorAll(selector);
    const timeline=gsap.timeline({defaults:{ease:'power2.inOut'},scrollTrigger:{trigger:el,start:'top top+=125',end:'bottom bottom',scrub:.65,invalidateOnRefresh:true,onUpdate:self=>{const next=Math.min(2,Math.floor(self.progress*3));if(next!==lastAct){lastAct=next;setAct(next);}}}});
-   timeline.fromTo(q('.story-glass-front'),{rotationY:-11,rotationX:7,y:28},{rotationY:0,rotationX:0,y:0,duration:1.3},0)
-    .to(q('.story-glass-front'),{rotationY:5,rotationX:-3,y:-12,duration:1.3},1.7)
-    .fromTo(q('.story-glass-back'),{x:25,y:30,rotationZ:5},{x:-22,y:-22,rotationZ:-3,duration:3},0)
-    .fromTo(q('.story-glass-middle'),{x:-18,y:15,rotationZ:-3},{x:16,y:16,rotationZ:2,duration:3},0)
+   const camera=[
+    {rotationY:-34,rotationX:18,rotationZ:-5,z:-110,y:35,scale:.92},
+    {rotationY:-22,rotationX:44,rotationZ:16,z:-100,y:30,scale:.9},
+    {rotationY:0,rotationX:52,rotationZ:-3,z:-110,y:40,scale:1.08},
+    {rotationY:32,rotationX:8,rotationZ:-8,z:-100,y:25,scale:.92},
+    {rotationY:-25,rotationX:32,rotationZ:7,z:100,y:35,scale:.9},
+    {rotationY:-11,rotationX:7,rotationZ:0,z:0,y:28,scale:1}
+   ][week-1];
+   // Travel into the model, then arrive at an undistorted reading plane.
+   timeline.fromTo(q('.story-glass-front'),camera,{rotationY:0,rotationX:0,rotationZ:0,z:0,y:0,scale:1,duration:1.55},0)
+    .fromTo(q('.story-glass-back'),{x:75,y:55,z:-180,rotationY:25,rotationZ:14},{x:-22,y:-22,z:-20,rotationY:0,rotationZ:-3,duration:2.5},0)
+    .fromTo(q('.story-glass-middle'),{x:-60,y:30,z:-90,rotationY:-20,rotationZ:-12},{x:16,y:16,z:-8,rotationY:0,rotationZ:2,duration:2.3},0)
     .fromTo(q('.story-ghost-number'),{y:75},{y:-80,duration:3,ease:'none'},0)
     .fromTo(q('.story-progress-fill'),{scaleX:0},{scaleX:1,duration:3,ease:'none'},0)
     .fromTo(q('.story-glass-sheen'),{xPercent:-130},{xPercent:130,duration:3,ease:'none'},0);
+   if(week===2||week===3)timeline.fromTo(q('.story-orbit-cage'),{rotationZ:-45,scale:.7,opacity:.2},{rotationZ:115,scale:1.12,opacity:.65,duration:3,ease:'none'},0);
    if(week===1){
     timeline.to(q('.matrix-source'),{opacity:0,duration:.6},.55).to(q('.matrix-watermark'),{opacity:0,duration:.6},.55)
      .to(q('.matrix-traveller'),{attr:{transform:(i:number)=>`translate(192 ${138+i*48})`},duration:1.2,stagger:.045},.65)
@@ -243,7 +252,7 @@ export function Story({week,reduced}:{week:number;reduced:boolean}){
      <div className="story-act-stack">{acts.map((item,i)=><div key={item.label} className={`story-act ${act===i?'is-current':''}`} aria-hidden={act!==i}><h2>{item.title.split('|').map((line,j)=><span key={line}>{j===1?<em>{line}</em>:line}</span>)}</h2><p>{item.body}</p></div>)}</div>
      <div className="story-readout"><span className="readout-icon" aria-hidden="true">⌁</span><div><span className="readout-label">The observation</span><p>{acts[act].reading}</p></div></div>
     </div>
-    <div className="story-stage-perspective"><div className="story-glass-back" aria-hidden="true"/><div className="story-glass-middle" aria-hidden="true"/>
+    <div className="story-stage-perspective">{(week===2||week===3)&&<div className="story-orbit-cage" aria-hidden="true"><i/><i/><i/><i/></div>}<div className="story-glass-back" aria-hidden="true"/><div className="story-glass-middle" aria-hidden="true"/>
      <div className="story-glass-front"><div className="story-glass-sheen" aria-hidden="true"/><div className="story-stage-header"><span className="stage-dot"/><span>{stageTitles[week-1]}</span><span className="stage-coordinate">FIG. 0{week}</span></div>
       <svg className="cinematic-svg" viewBox="0 0 720 500" role="img" aria-label={`${stageTitles[week-1]}. ${acts[2].body}`}><title>{stageTitles[week-1]}</title>
        {week===1?<MatrixScene still={reduced}/>:week===2?<ShortcutScene still={reduced}/>:week===3?<BfsScene still={reduced}/>:week===4?<CommunityScene still={reduced}/>:week===5?<LanguageScene still={reduced}/>:<VectorScene still={reduced}/>}

@@ -1,5 +1,4 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { gsap } from 'gsap';
 import './hero-experience.css';
 
 type Point = { x: number; y: number };
@@ -89,8 +88,15 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
   useEffect(() => {
     const section = root.current, viewport = stage.current, figure = actor.current;
     if (!section || !viewport || !figure) return;
-    let alive = true, visible = true, frameId = 0, scrollFrame = 0, lastTime = 0, progress = 0, drawnFrames = 0;
-    let manual: gsap.core.Tween | null = null, wantsPlayback = false, staticEnd = false;
+    let alive = true, visible = true, frameId = 0, lastTime: number | null = null, progress = 0, drawnFrames = 0;
+    let mode: 'scroll' | 'replay' | 'hold' | 'static' = reduced ? 'static' : 'scroll';
+    let requestedProgress = reduced ? .5 : 0, lastScrollProgress = 0, staticEnd = false;
+    let needsMeasure = true, scrollDirty = true, scrollInput = false;
+    let replayElapsed = 0, replayClock: number | null = null, replayFrom = 0, replayLeadIn = 0;
+    const replayDuration = 5800;
+    // A 50 ms time constant closes 96% of a scroll gap in 160 ms. Only this
+    // RAF owns the playhead, articulated pose, springs, and attached SVG webs.
+    const scrubTimeConstant = .05;
     let width = 1, height = 1;
     let actorBox = { x: 0, y: 0, width: 1, height: 1 };
     let letterBoxes: { x: number; y: number; width: number; height: number }[] = [];
@@ -132,15 +138,15 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
       target.tension = mix(a[5], b[5], eased);
       target.hang = mix(a[6], b[6], eased);
       if (phase.current) phase.current.textContent = progress < .28 ? '01 / Follow the thread' : progress < .6 ? '02 / One connection changes everything' : '03 / Nothing moves alone';
-      wake();
     }
     function draw(dt: number, snap = false) {
       const scale = width < 650 ? .56 : 1;
       const substeps = Math.max(1, Math.ceil(dt * 120));
       const stepDt = dt / substeps;
       let energy = 0;
-      const damping = snap ? 1 : 1 - Math.exp(-13 * dt);
-      for (const key of ['x', 'y', 'rotation'] as const) { pose[key] += (target[key] - pose[key]) * damping; energy += Math.abs(target[key] - pose[key]); }
+      // The playhead is already eased. A second actor-only filter would make
+      // its shoulder and hand trail the web-shooting beat by a different amount.
+      for (const key of ['x', 'y', 'rotation'] as const) pose[key] = target[key];
       figure!.style.transform = `translate3d(${pose.x}px,${pose.y}px,0) rotate(${pose.rotation}deg)`;
       reachingArm?.setAttribute('transform', `rotate(${target.tension * 18} 185 185)`);
       maskJoint?.setAttribute('transform', `rotate(${-target.tension * 9} 230 145)`);
@@ -164,7 +170,7 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
             particle.x += particle.vx * stepDt; particle.y += particle.vy * stepDt; particle.rotation += particle.vr * stepDt;
           }
         }
-        energy += Math.abs(tx - particle.x) + Math.abs(ty - particle.y) + Math.abs(particle.vx) + Math.abs(particle.vy) + Math.abs(particle.vr);
+        energy += Math.abs(tx - particle.x) + Math.abs(ty - particle.y) + Math.abs(tr - particle.rotation) + Math.abs(particle.vx) + Math.abs(particle.vy) + Math.abs(particle.vr);
         const element = letters.current[i];
         if (element) element.style.transform = `translate3d(${particle.x}px,${particle.y}px,0) rotate(${particle.rotation}deg)`;
         const box = letterBoxes[i];
@@ -194,18 +200,67 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
       section!.dataset.heroFrame = String(++drawnFrames);
       return energy;
     }
-    function tick(time: number) {
-      frameId = 0;
-      if (!alive || !visible || document.hidden) { lastTime = 0; return; }
-      const dt = lastTime ? Math.min(1, (time - lastTime) / 1000) : 1 / 60;
-      lastTime = time;
-      const energy = draw(dt, reduced);
-      if (!reduced && (energy > .14 || wantsPlayback)) frameId = requestAnimationFrame(tick);
-      else lastTime = 0;
+    function advanceReplayClock(now: number) {
+      if (mode === 'replay' && replayClock !== null) replayElapsed += Math.max(0, now - replayClock);
+      replayClock = mode === 'replay' ? now : null;
     }
-    function wake() { if (alive && visible && !document.hidden && !frameId) frameId = requestAnimationFrame(tick); }
+    function tick() {
+      frameId = 0;
+      if (!alive || !visible || document.hidden) { pause(); return; }
+      const now = performance.now();
+      const elapsed = lastTime === null ? 1 / 60 : Math.max(0, (now - lastTime) / 1000);
+      lastTime = now;
+      if (needsMeasure) measure();
+      if (scrollDirty && !reduced) {
+        const bounds = section!.getBoundingClientRect();
+        const stickyOffset = Number.parseFloat(getComputedStyle(viewport!).top) || 0;
+        const next = clamp((stickyOffset - bounds.top) / Math.max(1, section!.offsetHeight - viewport!.offsetHeight));
+        const userMoved = scrollInput && Math.abs(next - lastScrollProgress) > .00001;
+        lastScrollProgress = next;
+        if (userMoved) { mode = 'scroll'; replayClock = null; }
+        if (mode === 'scroll') requestedProgress = next;
+        scrollDirty = scrollInput = false;
+      }
+      if (mode === 'replay') {
+        advanceReplayClock(now);
+        if (replayElapsed < replayLeadIn) {
+          const t = clamp(replayElapsed / replayLeadIn);
+          requestedProgress = mix(replayFrom, 0, t * t * (3 - 2 * t));
+        } else requestedProgress = clamp((replayElapsed - replayLeadIn) / replayDuration);
+        // A monotonic local clock catches up after sparse frames. Real hidden
+        // or offscreen periods are explicitly excluded by pause()/wake().
+        progress = requestedProgress;
+        if (replayElapsed >= replayLeadIn + replayDuration) { mode = 'hold'; replayClock = null; }
+      } else if (reduced || drawnFrames === 0) progress = requestedProgress;
+      else {
+        progress += (requestedProgress - progress) * -Math.expm1(-elapsed / scrubTimeConstant);
+        if (Math.abs(requestedProgress - progress) < .0001) progress = requestedProgress;
+      }
+      updateTarget(progress);
+      const energy = draw(Math.min(1, elapsed), reduced || drawnFrames === 0);
+      section!.dataset.heroTarget = requestedProgress.toFixed(3);
+      section!.dataset.heroMode = mode;
+      section!.dataset.heroReplayTime = (replayElapsed / 1000).toFixed(3);
+      if (!reduced && (energy > .14 || mode === 'replay' || progress !== requestedProgress)) wake();
+      else { lastTime = null; section!.dataset.heroRunning = 'false'; }
+    }
+    function wake() {
+      if (!alive || !visible || document.hidden || frameId) return;
+      if (mode === 'replay' && replayClock === null) replayClock = performance.now();
+      section!.dataset.heroPaused = 'false';
+      section!.dataset.heroRunning = 'true';
+      frameId = requestAnimationFrame(tick);
+    }
+    function pause() {
+      advanceReplayClock(performance.now());
+      replayClock = null;
+      if (frameId) cancelAnimationFrame(frameId);
+      frameId = 0; lastTime = null;
+      section!.dataset.heroPaused = 'true';
+      section!.dataset.heroRunning = 'false';
+    }
     function measure() {
-      if (!alive) return;
+      needsMeasure = false;
       const bounds = viewport!.getBoundingClientRect();
       width = bounds.width; height = bounds.height;
       figure!.style.transform = 'none';
@@ -217,48 +272,37 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
         return { x: rect.left - bounds.left, y: rect.top - bounds.top, width: rect.width, height: rect.height };
       });
       threads.current?.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      updateTarget(progress); draw(1 / 60, reduced);
     }
     function scroll() {
-      if (reduced || scrollFrame) return;
-      scrollFrame = requestAnimationFrame(() => {
-        scrollFrame = 0;
-        const bounds = section!.getBoundingClientRect();
-        const stickyOffset = Number.parseFloat(getComputedStyle(viewport!).top) || 0;
-        const next = clamp((stickyOffset - bounds.top) / Math.max(1, section!.offsetHeight - viewport!.offsetHeight));
-        if (Math.abs(next - progress) < .003 && !wantsPlayback) return;
-        if (wantsPlayback) { manual?.kill(); wantsPlayback = false; }
-        updateTarget(next);
-        // A scroll position has an exact composition. The replay button supplies
-        // time-based spring motion; scrubbed poses must not depend on frame rate.
-        draw(1 / 60, true);
-      });
+      if (reduced) return;
+      scrollDirty = scrollInput = true;
+      wake();
     }
     replay.current = () => {
-      manual?.kill(); setPlayed(true);
-      if (reduced) { staticEnd = !staticEnd; updateTarget(staticEnd ? 1 : 0); draw(1 / 60, true); return; }
-      const playhead = { value: 0 };
-      updateTarget(0); wantsPlayback = true;
-      manual = gsap.to(playhead, { value: 1, duration: 5.8, ease: 'none', onUpdate: () => updateTarget(playhead.value), onComplete: () => { wantsPlayback = false; wake(); } });
+      setPlayed(true);
+      if (reduced) { staticEnd = !staticEnd; requestedProgress = staticEnd ? 1 : 0; wake(); return; }
+      mode = 'replay'; replayElapsed = 0; replayFrom = progress;
+      replayLeadIn = progress > .015 ? 240 : 0;
+      replayClock = visible && !document.hidden ? performance.now() : null;
       wake();
     };
     const observer = new IntersectionObserver(entries => {
       visible = entries[0].isIntersecting;
       section!.dataset.heroVisible = String(visible);
-      if (!visible) { if (frameId) cancelAnimationFrame(frameId); frameId = 0; lastTime = 0; manual?.pause(); }
-      else { if (wantsPlayback && !document.hidden) manual?.resume(); wake(); }
+      if (!visible) pause();
+      else wake();
     }, { threshold: 0 });
     observer.observe(viewport);
-    const visibility = () => { if (document.hidden) { manual?.pause(); if (frameId) cancelAnimationFrame(frameId); frameId = 0; lastTime = 0; } else if (visible) { if (wantsPlayback) manual?.resume(); wake(); } };
-    const resize = new ResizeObserver(measure); resize.observe(viewport);
+    const visibility = () => { if (document.hidden) pause(); else wake(); };
+    const requestMeasure = () => { if (!alive) return; needsMeasure = scrollDirty = true; wake(); };
+    const resize = new ResizeObserver(requestMeasure); resize.observe(viewport);
     document.addEventListener('visibilitychange', visibility);
     window.addEventListener('scroll', scroll, { passive: true });
-    measure();
-    if (reduced) { updateTarget(.5); draw(1 / 60, true); }
-    else scroll();
-    void document.fonts.ready.then(() => { if (alive) measure(); });
+    section.dataset.heroVisible = 'true';
+    wake();
+    void document.fonts.ready.then(requestMeasure);
     return () => {
-      alive = false; manual?.kill(); cancelAnimationFrame(frameId); cancelAnimationFrame(scrollFrame);
+      alive = false; cancelAnimationFrame(frameId);
       observer.disconnect(); resize.disconnect(); window.removeEventListener('scroll', scroll); document.removeEventListener('visibilitychange', visibility);
       replay.current = () => {};
     };
