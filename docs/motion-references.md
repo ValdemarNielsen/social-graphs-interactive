@@ -1,0 +1,54 @@
+# Motion references and the interface atmosphere pass
+
+The second motion pass responds to a request for a more expressive desktop experience. The references inform timing, depth and typography; this project does not download, copy or redistribute their images, scripts, fonts, dinosaur artwork or other assets.
+
+## References and what they contribute
+
+- [Ollivere](https://ollivere.webflow.io/) — the project’s browser review observed a dinosaur biting the word “Nonsense” and letters that droop. The useful lesson is that typography can respond with personality rather than appearing as a generic fade. The companion applies this at a smaller editorial scale: chapter title lines emerge with a brief perspective change, and diagram previews respond to the pointer. The dinosaur and its animation are not reproduced. The text-only web fetch of this reference failed; the observations come from the actual browser review, not that fetch.
+- [T.RICKS glassmorphism study](https://tricks-glassmorphism.webflow.io/) — a source for studying optical layers, fine rims and light on surfaces. Here the main laboratory panel gains a restrained layered gradient, a bright upper edge and a soft depth shadow. Its reading surface remains opaque enough to keep mathematical controls and charts legible. This is a fresh CSS implementation, not imported Webflow code. The page was reachable through the web reader; the project’s separate browser review examines the original moving composition.
+- [Codrops: On-Scroll Letter Animations](https://tympanus.net/codrops/2021/01/20/on-scroll-letter-animations/) — a reference for typography that develops with scroll position. The companion’s manifesto uses a continuous contrast sweep through existing lines, preserving the text and its DOM order. No demo assets or source code are copied, and no letter-splitting library is required by this interface pass.
+- [GSAP: matchMedia](https://gsap.com/docs/v3/GSAP/gsap.matchMedia()/) and [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) — primary implementation documentation for responsive, reversible animation setup and teardown. Desktop-only setup is scoped to a GSAP media context and is reverted when the route, viewport condition or reduced-motion state changes.
+- [Three.js: MeshPhysicalMaterial](https://threejs.org/docs/pages/MeshPhysicalMaterial.html) — the cover work researched transmission, iridescence and dispersion concepts in the official documentation. Week 6 uses an original custom WebGL shader; it does not import Three.js or claim physically exact optical simulation.
+- [Codrops Scroll3DGrid](https://tympanus.net/Development/Scroll3DGrid/) and [Codrops 3DCarousel](https://tympanus.net/Development/3DCarousel/) — the project reviewed these spatial compositions as further references for perspective and depth. Their assets and code are not included in this project.
+- [GSAP MotionPathPlugin](https://gsap.com/docs/v3/Plugins/MotionPathPlugin/) and [GSAP easing documentation](https://www.gsap.com/docs/v3/Eases/) — official implementation references reviewed for the expanded motion pass. The interlude’s route packet is instead an original finite sequence of SVG coordinate tweens along its calculated path, so its behavior does not require MotionPathPlugin.
+
+## Scope and ownership
+
+`MotionAtmosphere.tsx` is an effect-only component. Render it once with the current `route` number and resolved `reduced` boolean; it imports `motion-atmosphere.css` itself. It does not add wrappers, clone text, change a control value or own an application route.
+
+This module owns only chapter-title entrance transforms, the chapter background numeral’s parallax, small entrances on headings/objectives, the manifesto’s contrast variable and decorative chapter-preview pointer motion. The home hero and narrative Story sequences retain their own animation owners. No body paragraph, exercise prompt or mathematical value is hidden behind a reveal.
+
+The chapter title and numeral selectors support the new `.chapter-cover` / `.cover-edition` as well as the earlier `.chapter-hero` markup. The cover owns its composition, canvas and WebGL art; the atmosphere effect only adds those two editorial motions.
+
+The main laboratory glass treatment is static: it uses layered gradients, rim lighting and shadows. It does not animate filters or blur an entire scrolling canvas. Chart values, scales and control positions are untouched.
+
+## Behavior
+
+- Chapter title spans enter over 0.9 seconds with 0.12-second staggering; temporary transforms and clipping are cleared after the entrance.
+- The large chapter number drifts behind the title as that opening leaves the viewport. It is decorative and excluded from the accessible reading order by the original component.
+- The manifesto gains contrast as its lines cross the viewport. Even its initial state is visible; this is emphasis rather than a text unlock.
+- Headings and objective rows receive one short entrance when observed. Their initial opacity is 0.78, and body text remains unchanged. An IntersectionObserver avoids continuously polling every note section.
+- Chapter navigation links remain flat and stable. Only their decorative SVG previews tilt, with a localized light response behind the row. Keyboard focus receives the same visible light treatment; no pointer action is required to open a chapter.
+
+The effect is enabled only from **1024 CSS pixels** upward and when the resolved user/system preference allows motion. Small screens keep the base layout. The component tears down observers, listeners, animation frames, GSAP effects and temporary attributes on cleanup. It adds no perpetual floating animation and performs no network requests.
+
+This document records implementation intent and verified reference access. Visual integration, motion-in-browser review and performance checks must be recorded by the main QA pass after the component is mounted; source inspection alone does not certify those outcomes.
+
+## Twelve independent chapter episodes
+
+`ChapterInterlude.tsx` exports a component accepting `{ week, reduced, variant }`, where `variant` is `before-study` or `after-study`. Each chapter receives two different original scenes, a named central action, a visible result and a methodological note. Their layouts use SVG and local CSS; no third-party visual assets are used.
+
+| Week | Before study | After study | Numerical basis |
+| --- | --- | --- | --- |
+| 1 | Comic-style introductions update every node’s degree | Lettered node tiles move into degree bins | Exact graph degrees, edge count and handshaking identity |
+| 2 | A seeded preferential-attachment machine admits new nodes | An ensemble of 96 random worlds becomes an edge-count histogram | Seeded BA with m = 2 and complete K3 seed; exact G(12, 0.18) samples |
+| 3 | Transit lines gain an express connection and a packet traverses the shortest route | A severed bridge splits two islands | Breadth-first path, components and unreachable unordered pairs |
+| 4 | Contour-map borders redraw a fixed network’s partition | Weighted star links fade under a local disparity cutoff | Exact modularity at γ = 1; central-endpoint disparity α |
+| 5 | A printing plate cuts a sentence into lowercase tokens | Repeated letterpress blocks form a frequency skyline | Actual tokenizer output and exact token counts |
+| 6 | Three document cards collapse into TF-IDF columns | “Bank” changes from river to financial context | Relative-TF unsmoothed-IDF weights; exact context counts in a ±2 token window |
+
+All spatial positions are illustrative, except representation positions that explicitly encode a labelled bin or value. The context constellation is not a trained embedding. Community contours are not a community-detection algorithm, and a local disparity check is not a complete two-endpoint backbone. The random-world comparison is not presented as a statistical significance test. The scenes say this where the reader uses them.
+
+Animations have separate roles: a short scroll entrance traces edges, the outer framing responds gently to scroll, and each direct action animates a meaningful representation change. Packet movement is finite. There are no continuous animation loops in the episode module. Manual or system reduced motion preserves every action and result with immediate state changes. CSS and GSAP scopes are disposed on route/unmount; SVG titles describe current data and result text uses polite live regions.
+
+Both added TypeScript modules passed an isolated strict type check. Integrated visual QA remains a separate task; this document does not equate source validation with browser verification.

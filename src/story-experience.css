@@ -1,0 +1,230 @@
+/* Six different instruments for looking at a connected world. */
+.story.cinematic-story{height:330svh;min-height:2200px;margin:50px 0 90px;position:relative;isolation:isolate}
+.story.cinematic-story .cinematic-sticky{position:sticky;top:125px;width:min(1480px,calc(100% - 112px));height:calc(100svh - 125px);min-height:620px;margin-inline:auto;display:flex;flex-direction:column;justify-content:center;gap:0;padding:25px 0 24px;isolation:isolate}
+.cinematic-story .story-atmosphere{position:absolute;inset:-15% -6%;z-index:-2;pointer-events:none;background:radial-gradient(ellipse at 74% 45%,color-mix(in srgb,var(--accent) 8%,transparent),transparent 58%)}
+.cinematic-story .story-ghost-number{position:absolute;right:2%;top:10%;z-index:-1;font:500 clamp(330px,43vw,680px)/.8 var(--display);letter-spacing:-.1em;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--accent) 13%,transparent);pointer-events:none}
+.cinematic-story .story-topline,.cinematic-story .story-bottomline{display:flex;justify-content:space-between;align-items:center;gap:20px;font:9px/1.6 var(--display);letter-spacing:.13em;color:var(--muted);text-transform:uppercase;position:relative;z-index:3}
+.cinematic-story .story-topline{padding:0 0 22px;border-bottom:1px solid var(--line)}
+.cinematic-story .story-topline>span:first-child{display:flex;align-items:center;gap:12px}
+.cinematic-story .story-topline i{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px color-mix(in srgb,var(--accent) 60%,transparent)}
+.cinematic-story .story-composition{display:grid;grid-template-columns:.85fr 1.45fr;gap:6%;align-items:center;flex:1;min-height:0;padding:30px 0 35px}
+.cinematic-story .cinematic-copy{position:relative;z-index:4;padding:0 0 10px}
+.cinematic-story .cinematic-copy>.eyebrow{font-size:9px;letter-spacing:.16em;color:var(--accent);margin-bottom:25px}
+.cinematic-story .story-act-stack{display:grid;position:relative}
+.cinematic-story .story-act{grid-area:1/1;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity .45s,transform .6s,visibility .45s;pointer-events:none}
+.cinematic-story .story-act.is-current{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
+.cinematic-story .story-act h2{font:400 clamp(43px,4.3vw,72px)/.99 var(--display);letter-spacing:-.065em;margin:0 0 27px}
+.cinematic-story .story-act h2 span{display:block}
+.cinematic-story .story-act h2 em{font-family:var(--serif);font-size:1.14em;color:var(--accent);letter-spacing:-.04em;font-weight:400}
+.cinematic-story .story-act>p{font-size:12px;line-height:1.85;color:var(--muted);max-width:360px;margin:0}
+.cinematic-story .story-readout{margin-top:30px;display:flex;align-items:center;gap:17px;max-width:360px;border-top:1px solid var(--line);padding-top:20px}
+.cinematic-story .readout-icon{font:36px/1 var(--serif);color:var(--secondary)}
+.cinematic-story .readout-label{font:8px/1.6 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.cinematic-story .story-readout p{font:11px/1.6 var(--display);color:var(--text);margin:4px 0 0}
+.cinematic-story .story-stage-perspective{position:relative;perspective:1500px;min-width:0;isolation:isolate}
+.cinematic-story .story-glass-back,.cinematic-story .story-glass-middle{position:absolute;inset:0;border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:22px;pointer-events:none;background:color-mix(in srgb,var(--panel) 38%,transparent)}
+.cinematic-story .story-glass-back{box-shadow:0 0 65px color-mix(in srgb,var(--accent) 4%,transparent)}
+.cinematic-story .story-glass-middle{border-color:color-mix(in srgb,var(--secondary) 25%,transparent)}
+.cinematic-story .story-glass-front{position:relative;z-index:1;transform-style:preserve-3d;background:linear-gradient(145deg,color-mix(in srgb,var(--text) 5%,transparent),transparent 50%),color-mix(in srgb,var(--panel) 76%,transparent);border:1px solid color-mix(in srgb,var(--accent) 27%,transparent);border-radius:22px;box-shadow:0 32px 90px #0003,inset 0 1px 0 color-mix(in srgb,var(--text) 12%,transparent);backdrop-filter:blur(20px);overflow:hidden}
+.cinematic-story .story-glass-sheen{position:absolute;inset:0;width:70%;background:linear-gradient(110deg,transparent 20%,color-mix(in srgb,var(--text) 6%,transparent),transparent 80%);pointer-events:none;z-index:2}
+.cinematic-story .story-stage-header{display:flex;align-items:center;gap:10px;padding:20px 23px 14px;font:9px/1.5 var(--display);color:var(--text);letter-spacing:.025em;position:relative;z-index:1}
+.cinematic-story .stage-dot{width:5px;height:5px;border:1px solid var(--accent);border-radius:50%}
+.cinematic-story .stage-coordinate{margin-left:auto;color:var(--muted);font-size:8px;letter-spacing:.12em}
+.cinematic-story .cinematic-svg{display:block;width:100%;height:auto;max-height:56svh;overflow:visible;position:relative;z-index:1}
+.cinematic-story .story-stage-footer{position:relative;z-index:1;display:flex;justify-content:space-between;gap:15px;align-items:center;margin:0 23px;padding:14px 0 18px;border-top:1px solid var(--line);font:6px/1.5 var(--display);letter-spacing:.09em;color:var(--muted)}
+.cinematic-story .story-stage-footer>span:last-child{text-align:right;max-width:55%}
+.cinematic-story .story-floating-label{position:absolute;right:-16px;bottom:-17px;z-index:5;display:flex;align-items:center;gap:12px;padding:12px 18px;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:9px;background:color-mix(in srgb,var(--bg) 80%,transparent);box-shadow:0 10px 30px #0002;backdrop-filter:blur(20px);font:italic 21px/1 var(--serif);color:var(--accent)}
+.cinematic-story .story-floating-label>span{font:9px var(--display);color:var(--muted)}
+.cinematic-story .story-floating-label i{height:22px;width:1px;background:var(--line)}
+.cinematic-story .story-bottomline{padding-top:18px;border-top:1px solid var(--line);padding-bottom:17px}
+.cinematic-story .story-acts{display:flex;gap:28px}
+.cinematic-story .story-acts>div{display:flex;align-items:center;gap:9px;opacity:.34;transition:opacity .3s}
+.cinematic-story .story-acts>div.is-current{opacity:1;color:var(--accent)}
+.cinematic-story .story-acts>div>span{width:25px;height:25px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;font-size:8px;letter-spacing:0}
+.cinematic-story .story-acts p{font:9px/1.2 var(--display);letter-spacing:.04em;margin:0;text-transform:none}
+.cinematic-story .story-scroll-note{font-size:7px;letter-spacing:.12em}
+.cinematic-story .story-scroll-note>span{font-size:18px;margin-left:15px}
+.cinematic-story .cinematic-progress{height:1px;background:var(--line);width:100%;position:relative}
+.cinematic-story .story-progress-fill{height:1px;width:100%;display:block;background:var(--accent);transform-origin:left center}
+
+/* The illustrations share precise geometry, rather than a decorative graph. */
+.cinematic-story .scene-connection{stroke:var(--accent);stroke-width:1.5;stroke-opacity:.45;fill:none}
+.cinematic-story .node-orbit{fill:none;stroke:var(--accent);stroke-opacity:.24;stroke-width:1}
+.cinematic-story .node-core{fill:var(--accent);stroke:var(--panel);stroke-width:2}
+.cinematic-story .node-label{fill:var(--bg);font:500 12px var(--display);text-anchor:middle}
+.cinematic-story .secondary-node .node-core{fill:var(--secondary)}
+.cinematic-story .secondary-node .node-orbit{stroke:var(--secondary)}
+.cinematic-story .scene-label{fill:var(--muted);font:9px var(--display);letter-spacing:.13em}
+.cinematic-story .scene-annotation{fill:var(--muted);font:11px var(--display)}
+.cinematic-story .scene-big-number{fill:var(--accent);font:100px var(--serif)}
+.cinematic-story .scene-orbit-guide{fill:none;stroke:var(--accent);stroke-opacity:.18;stroke-dasharray:3 8;stroke-width:1}
+.cinematic-story .scene-watermark{fill:var(--accent);opacity:.065;font:110px var(--serif)}
+.cinematic-story .matrix-cell rect{fill:var(--accent);fill-opacity:.06;stroke:var(--accent);stroke-opacity:.12;stroke-width:1}
+.cinematic-story .matrix-cell text{fill:var(--muted);font:14px var(--display)}
+.cinematic-story .matrix-cell.matrix-on rect{fill-opacity:.82;stroke-opacity:1}
+.cinematic-story .matrix-cell.matrix-on text{fill:var(--bg)}
+.cinematic-story .matrix-bracket{fill:none;stroke:var(--accent);stroke-width:1.3;stroke-opacity:.7}
+.cinematic-story .long-route{fill:none;stroke:var(--secondary);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.cinematic-story .shortcut-shadow{fill:none;stroke:var(--secondary);stroke-width:18;stroke-opacity:.06}
+.cinematic-story .shortcut-flyover{fill:none;stroke:var(--secondary);stroke-width:4;stroke-linecap:round}
+.cinematic-story .shortcut-ship{fill:var(--secondary);filter:drop-shadow(0 0 8px var(--secondary))}
+.cinematic-story .shortcut-ship circle:last-child{fill:var(--text)}
+.cinematic-story .bfs-guides line{stroke:var(--accent);stroke-width:1;stroke-opacity:.12;stroke-dasharray:3 6}
+.cinematic-story .bfs-wave{stroke:var(--accent);stroke-width:1.5;fill:none}
+.cinematic-story .bfs-link{stroke-width:4;stroke-opacity:.8;stroke-linecap:round}
+.cinematic-story .scene-distance{fill:var(--accent);font:10px var(--display);text-anchor:middle}
+.cinematic-story .bfs-result rect{fill:var(--accent);fill-opacity:.08;stroke:var(--accent);stroke-opacity:.2}
+.cinematic-story .bfs-result text{fill:var(--accent);font:13px var(--display)}
+.cinematic-story .community-fields ellipse{fill:var(--accent);fill-opacity:.035;stroke:var(--accent);stroke-opacity:.35;stroke-dasharray:3 5}
+.cinematic-story .community-fields .second-field{fill:var(--secondary);stroke:var(--secondary)}
+.cinematic-story .community-bridge{stroke:var(--secondary);stroke-width:3;stroke-dasharray:5 6;stroke-opacity:.9}
+.cinematic-story .community-result .scene-formula{fill:var(--accent);font:22px var(--display);letter-spacing:-.04em}
+.cinematic-story .language-thread{stroke:var(--accent);stroke-width:1;stroke-dasharray:3 6;fill:none}
+.cinematic-story .language-tile-glass{fill:var(--text);fill-opacity:.025;stroke:var(--accent);stroke-opacity:.3}
+.cinematic-story .language-word{fill:var(--text);font:37px var(--serif);text-anchor:middle}
+.cinematic-story .language-index{fill:var(--muted);font:8px var(--display);letter-spacing:.08em}
+.cinematic-story .repeat-mark{fill:var(--secondary)}
+.cinematic-story .repeated-tile .language-tile-glass{stroke:var(--secondary);stroke-opacity:.55}
+.cinematic-story .vector-grid line{stroke:var(--accent);stroke-width:1;stroke-opacity:.1}
+.cinematic-story .vector-grid text{fill:var(--muted);font:10px var(--display)}
+.cinematic-story .vector-axes{stroke:var(--accent);stroke-width:1.3;stroke-opacity:.7;fill:none}
+.cinematic-story .vector-word rect{fill:var(--accent);fill-opacity:.04;stroke:var(--accent);stroke-opacity:.3}
+.cinematic-story .vector-word text{fill:var(--text);font:32px var(--serif);text-anchor:middle}
+.cinematic-story .vector-ray{stroke:currentColor;stroke-width:3;fill:none;filter:drop-shadow(0 0 5px currentColor)}
+.cinematic-story .vector-destination{color:var(--accent)}
+.cinematic-story .vector-color-1{color:var(--secondary)}
+.cinematic-story .vector-color-2{color:#edb19d}
+.cinematic-story .vector-destination>circle{fill:currentColor}
+.cinematic-story .vector-destination>circle.vector-point-orbit{fill:none;stroke:currentColor;stroke-opacity:.3}
+.cinematic-story .vector-destination>text{fill:currentColor;font:12px var(--display)}
+.cinematic-story .vector-angle path{fill:none;stroke:var(--secondary);stroke-width:1;stroke-dasharray:3 4}
+.cinematic-story .vector-angle text{fill:var(--secondary);font:12px var(--display)}
+
+/* 01 — a comic plate. The loose social scene folds into a printed matrix. */
+.story.cinematic-story.story-1 .story-atmosphere{background-image:radial-gradient(color-mix(in srgb,var(--accent) 13%,transparent) .65px,transparent .8px);background-size:7px 7px;mask-image:radial-gradient(ellipse at 70% 50%,#000,transparent 67%)}
+.story-1.cinematic-story .story-glass-front{border-radius:3px;border-width:2px;background:var(--bg);box-shadow:8px 8px 0 color-mix(in srgb,var(--accent) 12%,transparent);backdrop-filter:none}
+.story-1.cinematic-story .story-glass-back,.story-1.cinematic-story .story-glass-middle{border-radius:3px;background:var(--bg);border-color:color-mix(in srgb,var(--accent) 25%,transparent)}
+.story-1.cinematic-story .story-stage-header{border-bottom:1px solid var(--line);padding-block:16px;letter-spacing:.1em;text-transform:uppercase}
+.story-1.cinematic-story .story-stage-header:before{content:'●';color:var(--secondary);font-size:18px;line-height:1}
+.story-1.cinematic-story .stage-dot{display:none}
+.story-1.cinematic-story .story-floating-label{border-radius:0;border:1px solid var(--accent);background:var(--accent);color:var(--bg);transform:rotate(-5deg);bottom:-15px;right:25px;padding:13px 22px;box-shadow:4px 4px 0 var(--bg)}
+.story-1.cinematic-story .story-floating-label>span{color:var(--bg)}
+.story-1.cinematic-story .story-floating-label i{background:color-mix(in srgb,var(--bg) 40%,transparent)}
+.story-1.cinematic-story .matrix-cell rect{rx:2px}
+.story-1.cinematic-story .story-ghost-number{right:25%;top:6%;font-style:italic;-webkit-text-stroke:1px color-mix(in srgb,var(--accent) 17%,transparent)}
+.story-1.cinematic-story .story-act h2{font-weight:500}
+
+/* 02 — a circular brass observatory, with a shortcut flying outside its lens. */
+.story-2.cinematic-story .story-composition{grid-template-columns:.8fr 1.4fr;gap:5%}
+.story-2.cinematic-story .story-glass-front{border-radius:50%;background:radial-gradient(ellipse at 45% 25%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 63%),color-mix(in srgb,var(--panel) 78%,transparent);box-shadow:0 30px 80px #0004,inset 0 0 0 10px var(--bg),inset 0 0 0 11px color-mix(in srgb,var(--accent) 15%,transparent)}
+.story-2.cinematic-story .story-glass-back,.story-2.cinematic-story .story-glass-middle{border-radius:50%;inset:-8px 5px;border-color:color-mix(in srgb,var(--accent) 25%,transparent);background:none}
+.story-2.cinematic-story .story-glass-middle{inset:22px -14px;border-color:color-mix(in srgb,var(--secondary) 15%,transparent)}
+.story-2.cinematic-story .story-stage-header{justify-content:center;padding:34px 80px 0}
+.story-2.cinematic-story .stage-coordinate{display:none}
+.story-2.cinematic-story .cinematic-svg{max-height:52svh}
+.story-2.cinematic-story .story-stage-footer{justify-content:center;border:0;margin:0 auto;max-width:55%;padding:0 0 32px;gap:8px;flex-direction:column;text-align:center}
+.story-2.cinematic-story .story-stage-footer>span:last-child{max-width:100%;text-align:center}
+.story-2.cinematic-story .story-floating-label{bottom:8%;right:-10px;transform:rotate(4deg);border-radius:50px;background:var(--accent);color:var(--bg)}
+.story-2.cinematic-story .story-floating-label>span{color:var(--bg)}
+.story-2.cinematic-story .story-floating-label i{background:color-mix(in srgb,var(--bg) 35%,transparent)}
+.story-2.cinematic-story .story-ghost-number{right:13%;top:4%;font-family:var(--serif);font-weight:400;-webkit-text-stroke:0;color:color-mix(in srgb,var(--accent) 5%,transparent)}
+.story-2.cinematic-story .story-atmosphere:after{content:'';position:absolute;left:45%;top:20%;width:43%;aspect-ratio:1;border:1px dashed color-mix(in srgb,var(--accent) 20%,transparent);border-radius:50%;transform:rotate(-22deg) scaleX(1.2)}
+.story-2.cinematic-story .story-readout{border:1px solid var(--line);padding:17px 20px;border-radius:50px;width:fit-content}
+
+/* 03 — a wide transit map. Stations emerge one exact breadth-first layer at a time. */
+.story-3.cinematic-story .story-composition{grid-template-columns:1fr;gap:14px;padding-block:22px 25px}
+.story-3.cinematic-story .cinematic-copy{display:grid;grid-template-columns:1fr 270px;column-gap:35px;padding:0;align-items:end}
+.story-3.cinematic-story .cinematic-copy>.eyebrow{grid-column:1/-1;margin-bottom:14px}
+.story-3.cinematic-story .story-act{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+.story-3.cinematic-story .story-act h2{font-size:clamp(35px,3.3vw,55px);margin:0}
+.story-3.cinematic-story .story-act h2 span{display:inline}
+.story-3.cinematic-story .story-act h2 span+span:before{content:' '}
+.story-3.cinematic-story .story-act>p{font-size:11px;max-width:330px}
+.story-3.cinematic-story .story-readout{margin:0;padding:13px 0 13px 20px;border-top:0;border-left:1px solid var(--line);align-self:center;gap:12px}
+.story-3.cinematic-story .story-stage-perspective{width:100%;max-width:1100px;margin:auto}
+.story-3.cinematic-story .story-glass-front{border-radius:3px;background:linear-gradient(color-mix(in srgb,var(--accent) 3%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 3%,transparent) 1px,transparent 1px),color-mix(in srgb,var(--panel) 85%,transparent);background-size:30px 30px,30px 30px,100% 100%;box-shadow:0 25px 70px #0003}
+.story-3.cinematic-story .story-glass-back{border-radius:0;inset:12px 26px;background:none;border-color:var(--line)}
+.story-3.cinematic-story .story-glass-middle{border-radius:0;inset:-7px 16px;background:none;border-left:0;border-right:0}
+.story-3.cinematic-story .story-stage-header{padding:13px 20px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.15em;font-size:8px}
+.story-3.cinematic-story .cinematic-svg{max-height:39svh;min-height:250px}
+.story-3.cinematic-story .story-stage-footer{padding:10px 0;margin-inline:20px}
+.story-3.cinematic-story .story-floating-label{right:15px;bottom:17px;padding:10px 15px;font:10px var(--display);text-transform:uppercase;letter-spacing:.12em;border-radius:0}
+.story-3.cinematic-story .story-floating-label>span,.story-3.cinematic-story .story-floating-label>i{display:none}
+.story-3.cinematic-story .story-ghost-number{left:-2%;right:auto;top:14%;font-size:520px;-webkit-text-stroke:1px color-mix(in srgb,var(--accent) 9%,transparent)}
+.story-3.cinematic-story .bfs-node.bfs-depth-0 .node-orbit{stroke-opacity:.8;stroke-width:2}
+
+/* 04 — an atlas, placed to the left of its explanation. Geometry is not evidence. */
+.story-4.cinematic-story .story-composition{grid-template-columns:1.45fr .8fr;gap:8%}
+.story-4.cinematic-story .cinematic-copy{order:2}
+.story-4.cinematic-story .story-stage-perspective{order:1}
+.story-4.cinematic-story .story-glass-front{border-radius:2px;background:linear-gradient(90deg,transparent 49.85%,color-mix(in srgb,var(--accent) 10%,transparent) 49.9%,color-mix(in srgb,var(--accent) 10%,transparent) 50.1%,transparent 50.15%),linear-gradient(color-mix(in srgb,var(--accent) 3%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 3%,transparent) 1px,transparent 1px),var(--panel);background-size:100% 100%,40px 40px,40px 40px,100% 100%;box-shadow:0 30px 70px #0004}
+.story-4.cinematic-story .story-glass-back,.story-4.cinematic-story .story-glass-middle{border-radius:2px;background:var(--panel);border-color:color-mix(in srgb,var(--accent) 25%,transparent)}
+.story-4.cinematic-story .story-stage-header{font-family:var(--serif);font-size:19px;padding-top:20px}
+.story-4.cinematic-story .stage-dot{border:0;background:var(--accent);width:4px;height:18px;border-radius:0}
+.story-4.cinematic-story .stage-coordinate{font-family:var(--display)}
+.story-4.cinematic-story .story-floating-label{left:27px;right:auto;bottom:-20px;border-radius:2px;background:var(--secondary);color:var(--bg);transform:rotate(-3deg)}
+.story-4.cinematic-story .story-floating-label>span{color:var(--bg)}
+.story-4.cinematic-story .story-floating-label>i{background:color-mix(in srgb,var(--bg) 30%,transparent)}
+.story-4.cinematic-story .story-ghost-number{right:-2%;top:6%;color:color-mix(in srgb,var(--accent) 4%,transparent);-webkit-text-stroke:0}
+.story-4.cinematic-story .story-atmosphere{background:radial-gradient(ellipse at 26% 55%,color-mix(in srgb,var(--secondary) 8%,transparent),transparent 50%)}
+.story-4.cinematic-story .community-fields ellipse{stroke-width:1.5;fill-opacity:.06}
+.story-4.cinematic-story .community-result .scene-formula{font-family:var(--serif);font-size:29px}
+
+/* 05 — warm paper, printer's rules and movable type, instead of a screen. */
+.story-5.cinematic-story .story-composition{grid-template-columns:.75fr 1.4fr;gap:7%}
+.story-5.cinematic-story .story-glass-front{background:#f8f5ed;border:1px solid #d3cdbf;border-radius:0;box-shadow:0 30px 70px #3b3e2520,0 2px 4px #3b3e2510;backdrop-filter:none}
+.story-5.cinematic-story .story-glass-front:before,.story-5.cinematic-story .story-glass-front:after{content:'+';position:absolute;font:22px/1 var(--display);color:#a3aa9e;z-index:1;top:10px;left:10px}
+.story-5.cinematic-story .story-glass-front:after{left:auto;top:auto;right:10px;bottom:10px}
+.story-5.cinematic-story .story-glass-back,.story-5.cinematic-story .story-glass-middle{border-radius:0;background:#e5dfd1;border:1px solid #cfc8ba}
+.story-5.cinematic-story .story-glass-middle{background:#f2eee5}
+.story-5.cinematic-story .story-glass-sheen{background:linear-gradient(110deg,transparent,#fff7,transparent)}
+.story-5.cinematic-story .story-stage-header{font-family:var(--serif);font-size:24px;justify-content:center;padding:22px 30px 10px}
+.story-5.cinematic-story .stage-coordinate{position:absolute;right:28px;font:8px var(--display)}
+.story-5.cinematic-story .stage-dot{display:none}
+.story-5.cinematic-story .story-stage-footer{border-top:3px double #29443140;margin-inline:30px;padding-block:13px 19px;color:#526157}
+.story-5.cinematic-story .story-floating-label{background:#c05b37;color:#fff4de;border-radius:0;border:0;transform:rotate(-8deg);right:-12px;bottom:15px;box-shadow:none;font:italic 25px var(--serif)}
+.story-5.cinematic-story .story-floating-label>span{color:#fff4de}
+.story-5.cinematic-story .story-floating-label i{background:#fff4de50}
+.story-5.cinematic-story .story-act h2{font-family:var(--serif);font-size:clamp(52px,4.7vw,80px);letter-spacing:-.025em}
+.story-5.cinematic-story .story-act h2 em{font-size:1em}
+.story-5.cinematic-story .story-atmosphere{background:repeating-linear-gradient(0deg,transparent,transparent 29px,#49634a0a 29px,#49634a0a 30px);mask-image:radial-gradient(ellipse,#000,transparent 65%)}
+.story-5.cinematic-story .story-ghost-number{left:-5%;right:auto;top:16%;font-family:var(--serif);color:#4f6a4d07;-webkit-text-stroke:1px #4f6a4d12;font-weight:400}
+.story-5.cinematic-story .language-tile-glass{fill:#ded8c8;fill-opacity:.3;stroke:#8b9786;stroke-opacity:.5;rx:2px;filter:drop-shadow(0 2px 0 #4a624018)}
+.story-5.cinematic-story .language-word{fill:#243c2b;font-size:40px}
+.story-5.cinematic-story .repeated-tile .language-word{fill:#a34d2d}
+.story-5.cinematic-story .repeated-tile .language-tile-glass{stroke:#ad5c3b;fill:#d9aa83;fill-opacity:.1}
+.story-5.cinematic-story .language-index{fill:#687460}
+
+/* 06 — vectors suspended in a deep coordinate field. */
+.story-6.cinematic-story .story-composition{grid-template-columns:.8fr 1.5fr;gap:3%}
+.story-6.cinematic-story .story-stage-perspective{perspective:1800px}
+.story-6.cinematic-story .story-glass-front{border:0;border-radius:0;background:radial-gradient(ellipse at 43% 48%,#819de408,transparent 68%);backdrop-filter:none;box-shadow:none;overflow:visible}
+.story-6.cinematic-story .story-glass-back{inset:4% 8%;border-radius:50%;background:radial-gradient(ellipse,#7297e10b,transparent 68%);border:1px solid #a5c7f414;box-shadow:inset 0 0 55px #7d9bd80b,0 0 90px #7d9bd808}
+.story-6.cinematic-story .story-glass-middle{inset:13% -4%;border-radius:50%;background:none;border:1px dashed #d7bdeb18;transform:rotate(-30deg)}
+.story-6.cinematic-story .story-glass-sheen{display:none}
+.story-6.cinematic-story .story-stage-header{padding-left:10%;color:var(--accent);font-size:8px;text-transform:uppercase;letter-spacing:.14em}
+.story-6.cinematic-story .stage-dot{border:0;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.story-6.cinematic-story .story-stage-footer{margin-inline:10%;border-color:#a5c7f41c}
+.story-6.cinematic-story .story-floating-label{right:10%;bottom:-10px;border-radius:50px;background:#101728ad;border-color:#a5c7f430;box-shadow:0 0 30px #a5c7f408}
+.story-6.cinematic-story .story-ghost-number{right:-2%;top:10%;font:400 clamp(440px,52vw,800px)/.8 var(--serif);color:#a5c7f405;-webkit-text-stroke:1px #a5c7f40c}
+.story-6.cinematic-story .story-atmosphere{background:radial-gradient(ellipse at 68% 45%,#597dc51c,transparent 54%),radial-gradient(ellipse at 82% 30%,#b99be50b,transparent 30%)}
+.story-6.cinematic-story .vector-word rect{fill:#17243b;fill-opacity:.8;stroke-opacity:.32;filter:drop-shadow(0 7px 14px #0003)}
+.story-6.cinematic-story .vector-word text{fill:#e0e9f9}
+.story-6.cinematic-story .vector-destination>circle:not(.vector-point-orbit){filter:drop-shadow(0 0 9px currentColor)}
+
+@media(min-width:1600px){.cinematic-story .story-act h2{font-size:78px}.story.cinematic-story .cinematic-sticky{width:min(1560px,calc(100% - 160px))}.cinematic-story .story-composition{gap:8%}.story-3.cinematic-story .story-composition{gap:22px}.story-3.cinematic-story .story-act h2{font-size:56px}}
+@media(max-height:820px) and (min-width:1000px){.story.cinematic-story .cinematic-sticky{min-height:570px;padding-block:17px}.cinematic-story .story-topline{padding-bottom:12px}.cinematic-story .story-composition{padding-block:20px 25px}.cinematic-story .cinematic-svg{max-height:49svh}.cinematic-story .story-act h2{font-size:clamp(40px,4vw,61px);margin-bottom:20px}.cinematic-story .story-act>p{font-size:11px}.cinematic-story .cinematic-copy>.eyebrow{margin-bottom:17px}.cinematic-story .story-readout{margin-top:20px;padding-top:15px}.cinematic-story .story-stage-header{padding-top:15px}.cinematic-story .story-bottomline{padding-top:12px;padding-bottom:10px}.story-2.cinematic-story .cinematic-svg{max-height:45svh}.story-2.cinematic-story .story-stage-header{padding-top:27px}.story-2.cinematic-story .story-stage-footer{padding-bottom:25px}.story-3.cinematic-story .cinematic-svg{max-height:35svh;min-height:215px}.story-3.cinematic-story .story-act h2{font-size:40px}.story-3.cinematic-story .story-composition{gap:12px;padding-block:18px}.story-3.cinematic-story .story-readout{margin:0}.story-5.cinematic-story .story-act h2{font-size:62px}}
+@media(max-width:1100px){.story.cinematic-story .cinematic-sticky{width:calc(100% - 64px)}.cinematic-story .story-composition{gap:4%}.cinematic-story .story-act h2{font-size:47px}.cinematic-story .story-act>p{font-size:11px}.cinematic-story .story-acts{gap:18px}.cinematic-story .story-acts p{font-size:8px}.cinematic-story .story-scroll-note{font-size:6px}.story-3.cinematic-story .cinematic-copy{grid-template-columns:1fr 210px;gap:20px}.story-3.cinematic-story .story-act{grid-template-columns:1fr 1fr;gap:22px}.story-3.cinematic-story .story-act h2{font-size:36px}.story-3.cinematic-story .story-act>p{font-size:10px}.story-4.cinematic-story .story-composition{gap:5%}.story-5.cinematic-story .story-act h2{font-size:57px}}
+@media(max-width:820px){.story.cinematic-story{height:300svh;min-height:1900px;margin-block:25px 55px}.story.cinematic-story .cinematic-sticky{top:120px;width:calc(100% - 40px);height:calc(100svh - 120px);min-height:670px;padding-block:15px}.cinematic-story .story-topline{font-size:7px;padding-bottom:12px}.cinematic-story .story-composition,.story-4.cinematic-story .story-composition{display:grid;grid-template-columns:1fr;gap:20px;padding:20px 0 24px;align-content:center}.cinematic-story .cinematic-copy,.story-4.cinematic-story .cinematic-copy{order:0;display:block;padding:0}.cinematic-story .cinematic-copy>.eyebrow{font-size:8px;margin-bottom:14px}.cinematic-story .story-act h2,.story-5.cinematic-story .story-act h2{font-size:42px;line-height:1.02;margin-bottom:16px}.cinematic-story .story-act h2 span{display:inline}.cinematic-story .story-act h2 span+span:before{content:' '}.cinematic-story .story-act>p{font-size:11px;max-width:550px;line-height:1.7}.cinematic-story .story-readout{display:none}.cinematic-story .story-stage-perspective,.story-4.cinematic-story .story-stage-perspective{max-width:620px;width:100%;margin-inline:auto;order:1}.cinematic-story .cinematic-svg{max-height:36svh;min-height:225px}.cinematic-story .story-stage-header{padding:13px 15px 5px;font-size:8px}.cinematic-story .story-stage-footer{margin-inline:15px;padding:10px 0 13px;font-size:5px}.cinematic-story .story-glass-back,.cinematic-story .story-glass-middle{border-radius:10px}.cinematic-story .story-floating-label{right:8px;bottom:-10px;font-size:16px;padding:8px 12px;gap:8px}.cinematic-story .story-floating-label>span{font-size:7px}.cinematic-story .story-floating-label>i{height:18px}.cinematic-story .story-bottomline{padding-top:13px;padding-bottom:10px;gap:15px}.cinematic-story .story-acts{gap:16px}.cinematic-story .story-acts>div{gap:6px}.cinematic-story .story-acts>div>span{width:20px;height:20px;font-size:7px}.cinematic-story .story-acts p{font-size:7px;max-width:90px}.cinematic-story .story-scroll-note{display:none}.cinematic-story .story-ghost-number{font-size:450px;top:20%;right:-15%;opacity:.65}.story-2.cinematic-story .story-glass-front{border-radius:50%}.story-2.cinematic-story .story-glass-back,.story-2.cinematic-story .story-glass-middle{border-radius:50%}.story-2.cinematic-story .story-stage-perspective{max-width:500px}.story-2.cinematic-story .story-stage-header{padding:24px 60px 0}.story-2.cinematic-story .cinematic-svg{max-height:34svh;min-height:220px}.story-2.cinematic-story .story-stage-footer{padding:0 0 23px;font-size:5px}.story-2.cinematic-story .story-floating-label{bottom:6%;right:0}.story-3.cinematic-story .story-act{display:block}.story-3.cinematic-story .cinematic-copy>.eyebrow{grid-column:auto}.story-3.cinematic-story .story-act h2{font-size:42px}.story-3.cinematic-story .story-act>p{font-size:11px;max-width:550px}.story-3.cinematic-story .cinematic-svg{max-height:35svh;min-height:220px}.story-3.cinematic-story .story-floating-label{bottom:10px;font-size:7px}.story-4.cinematic-story .story-stage-header{font-size:18px}.story-4.cinematic-story .story-floating-label{left:20px;right:auto;bottom:-13px}.story-5.cinematic-story .story-glass-back,.story-5.cinematic-story .story-glass-middle{border-radius:0}.story-5.cinematic-story .story-stage-header{font-size:22px;padding:18px 30px 4px}.story-5.cinematic-story .story-stage-footer{margin-inline:23px;padding:10px 0 14px}.story-5.cinematic-story .story-floating-label{font-size:19px;bottom:10px;right:-5px}.story-6.cinematic-story .story-glass-back,.story-6.cinematic-story .story-glass-middle{border-radius:50%}.story-6.cinematic-story .story-stage-header{padding-left:10%}.story-6.cinematic-story .story-stage-footer{margin-inline:10%}}
+@media(max-width:480px){.story.cinematic-story .cinematic-sticky{min-height:610px}.cinematic-story .story-act h2,.story-3.cinematic-story .story-act h2,.story-5.cinematic-story .story-act h2{font-size:36px}.cinematic-story .story-composition{gap:20px;padding-block:20px}.cinematic-story .cinematic-svg{min-height:220px;max-height:30svh}.cinematic-story .story-acts{gap:13px}.cinematic-story .story-acts p{font-size:6px;max-width:70px}.cinematic-story .story-acts>div{gap:5px}.cinematic-story .story-acts>div>span{width:18px;height:18px;font-size:6px}.cinematic-story .story-stage-footer{font-size:4.5px}.story-2.cinematic-story .story-stage-header{font-size:7px;padding:21px 35px 0}.story-2.cinematic-story .cinematic-svg{min-height:215px;max-height:30svh}.story-2.cinematic-story .story-stage-footer{padding-bottom:20px;max-width:65%}.story-5.cinematic-story .story-stage-header{font-size:20px}.story-6.cinematic-story .story-ghost-number{font-size:480px}}
+.story.cinematic-story.static{height:auto;min-height:0;margin-block:55px 85px}
+.story.cinematic-story.static .cinematic-sticky{position:relative;top:auto;height:auto;min-height:680px;padding-block:28px}
+.story.cinematic-story.static .story-composition{padding-block:60px}
+.story.cinematic-story.static .story-glass-back{transform:translate(-14px,-13px) rotate(-2deg)}
+.story.cinematic-story.static .story-glass-middle{transform:translate(10px,12px) rotate(2deg)}
+.story.cinematic-story.static .story-glass-sheen{display:none}
+.story.cinematic-story.static .matrix-watermark{opacity:0}
+.story.cinematic-story.static .story-act{transition:none}
+.story.cinematic-story.static .story-progress-fill{transform:scaleX(1)}
+@media(max-width:820px){.story.cinematic-story.static .cinematic-sticky{min-height:0}.story.cinematic-story.static .story-composition{padding-block:35px}.story.cinematic-story.static .cinematic-svg{max-height:none;min-height:220px}.story.cinematic-story.static .story-bottomline{margin-top:20px}}
+@media(prefers-reduced-motion:reduce){.cinematic-story .story-act,.cinematic-story .story-acts>div{transition:none}}

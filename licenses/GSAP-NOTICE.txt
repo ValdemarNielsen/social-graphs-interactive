@@ -1,0 +1,16 @@
+GSAP 3.15.0, including ScrollTrigger
+
+The installed GSAP distribution identifies:
+Copyright 2008-2026, GreenSock. All rights reserved.
+
+GSAP is governed by its own standard no-charge license, not by this project's
+MIT license. The license and the package's required proprietary notices apply
+to all uses of the GSAP library and plugins.
+
+License source: https://gsap.com/standard-license/
+Current destination: https://gsap.com/community/standard-license/
+Package source: https://github.com/greensock/GSAP
+
+The terms were reviewed on 19 October 2026. The current license page identifies
+Webflow as the licensor. Retain the original library copyright and license
+headers when copying or redistributing the library.
