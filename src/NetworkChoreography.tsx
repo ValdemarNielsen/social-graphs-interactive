@@ -1,10 +1,10 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useId, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useVisibleSequence } from './useVisibleSequence';
 import './network-choreography.css';
 
-gsap.registerPlugin(ScrollTrigger);
+
 
 type Props = { week: 1 | 2 | 3; reduced: boolean; variant: 'middle' | 'closing' };
 type Scene = '1-middle' | '1-closing' | '2-middle' | '2-closing' | '3-middle' | '3-closing';
@@ -61,7 +61,7 @@ function Portrait({ index }: { index: number }) {
 }
 
 function PaperWorld() {
-  return <div className="nc-paper-stage nc-art" aria-hidden="true">
+  return <div className="nc-paper-stage nc-art" data-sequence-stage aria-hidden="true">
     <div className="nc-paper-grid" />
     <div className="nc-paper-running">THE SOCIAL GRAPH GAZETTE <span>RELATIONSHIPS, REVEALED.</span> ISSUE 01</div>
     <div className="nc-paper-strip">
@@ -73,7 +73,7 @@ function PaperWorld() {
 }
 
 function MatrixPress() {
-  return <div className="nc-matrix-stage nc-art" aria-hidden="true"><div className="nc-machine-label">ADJACENCY / MODEL A–F <span>UNDIRECTED · UNWEIGHTED</span></div><div className="nc-matrix-copy"><span>THE</span><strong>MIRROR<br />RULE.</strong><p>A ↔ B<br /><b>A,B = B,A</b></p><div className="nc-press-dial"><i /><span>2×</span></div></div><div className="nc-matrix-assembly"><div className="nc-matrix-header"><span />{letters.map(l => <b key={l}>{l}</b>)}</div><div className="nc-matrix-grid">{letters.map((l, row) => <div className="nc-matrix-row" key={l}><b className="nc-row-label">{l}</b>{letters.map((_, col) => <div key={col} className={`nc-matrix-cell ${connected(row, col) ? 'is-one' : ''} ${row === col ? 'is-diagonal' : ''} ${row + col === 1 ? 'is-pair' : ''}`} data-row={row} data-col={col}><span>{connected(row, col) ? 1 : 0}</span><i /></div>)}</div>)}</div><div className="nc-matrix-scanner"><i /><span>READING RELATIONSHIPS</span></div><div className="nc-matrix-plaque"><b>07<small>EDGES</small></b><span>→</span><b>14<small>ONES</small></b><span>/</span><b>00<small>DIAGONAL</small></b></div></div><div className="nc-machine-screw nc-screw-a" /><div className="nc-machine-screw nc-screw-b" /></div>;
+  return <div className="nc-matrix-stage nc-art" data-sequence-stage aria-hidden="true"><div className="nc-machine-label">ADJACENCY / MODEL A–F <span>UNDIRECTED · UNWEIGHTED</span></div><div className="nc-matrix-copy"><span>THE</span><strong>MIRROR<br />RULE.</strong><p>A ↔ B<br /><b>A,B = B,A</b></p><div className="nc-press-dial"><i /><span>2×</span></div></div><div className="nc-matrix-assembly"><div className="nc-matrix-header"><span />{letters.map(l => <b key={l}>{l}</b>)}</div><div className="nc-matrix-grid">{letters.map((l, row) => <div className="nc-matrix-row" key={l}><b className="nc-row-label">{l}</b>{letters.map((_, col) => <div key={col} className={`nc-matrix-cell ${connected(row, col) ? 'is-one' : ''} ${row === col ? 'is-diagonal' : ''} ${row + col === 1 ? 'is-pair' : ''}`} data-row={row} data-col={col}><span>{connected(row, col) ? 1 : 0}</span><i /></div>)}</div>)}</div><div className="nc-matrix-scanner"><i /><span>READING RELATIONSHIPS</span></div><div className="nc-matrix-plaque"><b>07<small>EDGES</small></b><span>→</span><b>14<small>ONES</small></b><span>/</span><b>00<small>DIAGONAL</small></b></div></div><div className="nc-machine-screw nc-screw-a" /><div className="nc-machine-screw nc-screw-b" /></div>;
 }
 
 const cascadeLevels = [[600], [330, 870], [195, 465, 735, 1005], [127.5, 262.5, 397.5, 532.5, 667.5, 802.5, 937.5, 1072.5]];
@@ -83,7 +83,7 @@ const sums = sequences.map(s => [...s].filter(b => b === '1').length);
 function chipEnd(index: number) { const bin = sums[index]; const rank = sums.slice(0, index).filter(n => n === bin).length; return { x: 300 + bin * 200, y: 478 - rank * 23 }; }
 
 function ChanceCascade() {
-  return <div className="nc-cascade-stage nc-art" aria-hidden="true"><div className="nc-cascade-sidebar"><b>½</b><span>AT EVERY<br />DECISION</span></div><svg viewBox="0 0 1200 550"><defs><linearGradient id="nc-track-metal" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#b9b2a1" /><stop offset=".5" stopColor="#585550" /><stop offset="1" stopColor="#242625" /></linearGradient></defs><g className="nc-cascade-tracks">{cascadeLevels.slice(0, 3).flatMap((level, depth) => level.flatMap((x, index) => [0, 1].map(bit => { const end = cascadeLevels[depth + 1][index * 2 + bit]; return <g key={`${depth}-${index}-${bit}`}><path className="nc-track-shadow" d={`M${x} ${cascadeY[depth]}C${x} ${cascadeY[depth] + 50} ${end} ${cascadeY[depth + 1] - 45} ${end} ${cascadeY[depth + 1]}`} /><path className="nc-cascade-line" pathLength="1" d={`M${x} ${cascadeY[depth]}C${x} ${cascadeY[depth] + 50} ${end} ${cascadeY[depth + 1] - 45} ${end} ${cascadeY[depth + 1]}`} /><text x={(x + end) / 2 + (bit ? 14 : -14)} y={(cascadeY[depth] + cascadeY[depth + 1]) / 2 - 5}>{bit}</text></g>; })))}</g>{cascadeLevels.slice(0, 3).flatMap((level, d) => level.map((x, i) => <g className="nc-decision-gate" key={`${d}-${i}`} transform={`translate(${x} ${cascadeY[d]})`}><circle r="14" /><path d="M-6-3L0 4L6-3" /></g>))}<g className="nc-sequence-labels">{sequences.map((s, i) => <g key={s} transform={`translate(${cascadeLevels[3][i]} 375)`}><rect x="-31" y="-17" width="62" height="28" rx="5" /><text textAnchor="middle" y="3">{s}</text><text className="nc-sequence-chance" textAnchor="middle" y="26">⅛</text></g>)}</g><g className="nc-collection-bins">{[1, 3, 3, 1].map((count, i) => <g key={i} transform={`translate(${300 + i * 200} 492)`}><path className="nc-bin" d="M-59-65L-53 0H53L59-65" /><path className="nc-bin-line" d="M-45 5H45" /><text textAnchor="middle" y="29">{i} {i === 1 ? 'success' : 'successes'}</text><text className="nc-bin-fraction" textAnchor="middle" y="52">{count}/8</text></g>)}</g>{sequences.map((s, i) => { const end = chipEnd(i); return <g className="nc-cascade-chip" data-chip={i} key={s} transform={`translate(${end.x} ${end.y})`}><rect x="-22" y="-10" width="44" height="20" rx="8" /><text textAnchor="middle" y="4">{s}</text><path d="M-14-6H13" /></g>; })}</svg><div className="nc-cascade-formula"><span>THE BINOMIAL SHAPE</span><strong>1 : 3 : 3 : 1</strong><small>8 possible sequences · 3 independent trials</small></div></div>;
+  return <div className="nc-cascade-stage nc-art" data-sequence-stage aria-hidden="true"><div className="nc-cascade-sidebar"><b>½</b><span>AT EVERY<br />DECISION</span></div><svg viewBox="0 0 1200 550"><defs><linearGradient id="nc-track-metal" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#b9b2a1" /><stop offset=".5" stopColor="#585550" /><stop offset="1" stopColor="#242625" /></linearGradient></defs><g className="nc-cascade-tracks">{cascadeLevels.slice(0, 3).flatMap((level, depth) => level.flatMap((x, index) => [0, 1].map(bit => { const end = cascadeLevels[depth + 1][index * 2 + bit]; return <g key={`${depth}-${index}-${bit}`}><path className="nc-track-shadow" d={`M${x} ${cascadeY[depth]}C${x} ${cascadeY[depth] + 50} ${end} ${cascadeY[depth + 1] - 45} ${end} ${cascadeY[depth + 1]}`} /><path className="nc-cascade-line" pathLength="1" d={`M${x} ${cascadeY[depth]}C${x} ${cascadeY[depth] + 50} ${end} ${cascadeY[depth + 1] - 45} ${end} ${cascadeY[depth + 1]}`} /><text x={(x + end) / 2 + (bit ? 14 : -14)} y={(cascadeY[depth] + cascadeY[depth + 1]) / 2 - 5}>{bit}</text></g>; })))}</g>{cascadeLevels.slice(0, 3).flatMap((level, d) => level.map((x, i) => <g className="nc-decision-gate" key={`${d}-${i}`} transform={`translate(${x} ${cascadeY[d]})`}><circle r="14" /><path d="M-6-3L0 4L6-3" /></g>))}<g className="nc-sequence-labels">{sequences.map((s, i) => <g key={s} transform={`translate(${cascadeLevels[3][i]} 375)`}><rect x="-31" y="-17" width="62" height="28" rx="5" /><text textAnchor="middle" y="3">{s}</text><text className="nc-sequence-chance" textAnchor="middle" y="26">⅛</text></g>)}</g><g className="nc-collection-bins">{[1, 3, 3, 1].map((count, i) => <g key={i} transform={`translate(${300 + i * 200} 492)`}><path className="nc-bin" d="M-59-65L-53 0H53L59-65" /><path className="nc-bin-line" d="M-45 5H45" /><text textAnchor="middle" y="29">{i} {i === 1 ? 'success' : 'successes'}</text><text className="nc-bin-fraction" textAnchor="middle" y="52">{count}/8</text></g>)}</g>{sequences.map((s, i) => { const end = chipEnd(i); return <g className="nc-cascade-chip" data-chip={i} key={s} transform={`translate(${end.x} ${end.y})`}><rect x="-22" y="-10" width="44" height="20" rx="8" /><text textAnchor="middle" y="4">{s}</text><path d="M-14-6H13" /></g>; })}</svg><div className="nc-cascade-formula"><span>THE BINOMIAL SHAPE</span><strong>1 : 3 : 3 : 1</strong><small>8 possible sequences · 3 independent trials</small></div></div>;
 }
 
 function gearPath(teeth: number, radius: number) {
@@ -91,14 +91,14 @@ function gearPath(teeth: number, radius: number) {
 }
 
 function TicketFactory() {
-  return <div className="nc-ticket-stage nc-art" aria-hidden="true"><div className="nc-ticket-heading"><span>DEGREE IN → CHANCES OUT</span><b>THE ATTACHMENT WORKS</b><span>ONE DRAW / SIX TICKETS</span></div><div className="nc-ticket-machinery"><svg className="nc-gears" viewBox="0 0 1200 400">{[[160, 190, 120, 16], [1045, 190, 120, 16], [342, 252, 70, 12], [875, 81, 52, 10]].map(([x, y, r, teeth], i) => <g transform={`translate(${x} ${y})`} key={i}><g className="nc-gear" data-direction={i % 2 ? -1 : 1}><path d={gearPath(teeth, r)} /><circle r={r * .6} /><circle r={r * .2} />{[0, 60, 120].map(a => <path key={a} transform={`rotate(${a})`} d={`M${-r * .55} 0H${r * .55}`} />)}</g></g>)}</svg><div className="nc-ticket-input">{['A', 'B', 'C', 'D'].map((l, i) => <div key={l} className="nc-degree-input"><span>{l}</span><b>{i ? '01' : '03'}</b><small>DEGREE</small></div>)}</div><div className="nc-conveyor"><div className="nc-conveyor-belt" /><div className="nc-ticket-pool">{['A', 'A', 'A', 'B', 'C', 'D'].map((l, i) => <div className={`nc-lottery-ticket ${l === 'A' ? 'is-popular' : ''}`} key={i}><span>ADMIT ONE</span><strong>{l}</strong><i /><small>CHANCE {String(i + 1).padStart(2, '0')} / 06</small></div>)}</div><div className="nc-conveyor-rail" /></div><div className="nc-ticket-output"><div className="nc-ticket-odds"><span>P(A)</span><b>½</b><small>3 OF 6 TICKETS</small></div><div className="nc-ticket-odds"><span>P(B) = P(C) = P(D)</span><b>⅙</b><small>1 OF 6 TICKETS EACH</small></div></div><div className="nc-chance-stamp">CHANCE<br /><b>≠</b> CERTAINTY</div></div></div>;
+  return <div className="nc-ticket-stage nc-art" data-sequence-stage aria-hidden="true"><div className="nc-ticket-heading"><span>DEGREE IN → CHANCES OUT</span><b>THE ATTACHMENT WORKS</b><span>ONE DRAW / SIX TICKETS</span></div><div className="nc-ticket-machinery"><svg className="nc-gears" viewBox="0 0 1200 400">{[[160, 190, 120, 16], [1045, 190, 120, 16], [342, 252, 70, 12], [875, 81, 52, 10]].map(([x, y, r, teeth], i) => <g transform={`translate(${x} ${y})`} key={i}><g className="nc-gear" data-direction={i % 2 ? -1 : 1}><path d={gearPath(teeth, r)} /><circle r={r * .6} /><circle r={r * .2} />{[0, 60, 120].map(a => <path key={a} transform={`rotate(${a})`} d={`M${-r * .55} 0H${r * .55}`} />)}</g></g>)}</svg><div className="nc-ticket-input">{['A', 'B', 'C', 'D'].map((l, i) => <div key={l} className="nc-degree-input"><span>{l}</span><b>{i ? '01' : '03'}</b><small>DEGREE</small></div>)}</div><div className="nc-conveyor"><div className="nc-conveyor-belt" /><div className="nc-ticket-pool">{['A', 'A', 'A', 'B', 'C', 'D'].map((l, i) => <div className={`nc-lottery-ticket ${l === 'A' ? 'is-popular' : ''}`} key={i}><span>ADMIT ONE</span><strong>{l}</strong><i /><small>CHANCE {String(i + 1).padStart(2, '0')} / 06</small></div>)}</div><div className="nc-conveyor-rail" /></div><div className="nc-ticket-output"><div className="nc-ticket-odds"><span>P(A)</span><b>½</b><small>3 OF 6 TICKETS</small></div><div className="nc-ticket-odds"><span>P(B) = P(C) = P(D)</span><b>⅙</b><small>1 OF 6 TICKETS EACH</small></div></div><div className="nc-chance-stamp">CHANCE<br /><b>≠</b> CERTAINTY</div></div></div>;
 }
 
 const stationNodes = [[40, 120], [135, 45], [135, 195], [235, 120], [335, 120], [335, 235]];
 const stationEdges = [[0, 1], [0, 2], [1, 3], [2, 3], [3, 4]];
 const distances = ['00', '01', '01', '02', '03', '∞'];
 function DistanceStation() {
-  return <div className="nc-station-stage nc-art" aria-hidden="true"><div className="nc-station-bar"><span className="nc-station-symbol">↗</span><b>HOP DISTANCES</b><span>SOURCE <strong>A</strong></span><i>UNWEIGHTED SERVICE</i></div><div className="nc-station-layout"><div className="nc-departure-board"><div className="nc-departure-head"><span>DESTINATION</span><span>HOPS</span><span>STATUS</span></div>{letters.map((l, i) => <div className={`nc-departure-row ${i === 5 ? 'is-isolated' : ''}`} key={l}><div className="nc-station-destination"><span className="nc-station-node">{l}</span><span>NODE {l}</span></div><div className="nc-flap-number">{(i === 5 ? ['∞'] : distances[i].split('')).map((char, j) => <div className="nc-flap" key={j}><span className="nc-flap-base">{char}</span><span className="nc-flap-lid">–</span><i /></div>)}</div><span className="nc-station-status">{['SOURCE', 'ONE EDGE', 'ONE EDGE', 'TWO EDGES', 'THREE EDGES', 'UNREACHABLE'][i]}</span></div>)}</div><div className="nc-station-map"><span>THE ACTUAL CONNECTIONS</span><svg viewBox="0 0 390 290">{stationEdges.map(([a, b]) => <path className="nc-station-track" pathLength="1" key={`${a}-${b}`} d={`M${stationNodes[a][0]} ${stationNodes[a][1]}L${stationNodes[b][0]} ${stationNodes[b][1]}`} />)}{stationNodes.map(([x, y], i) => <g key={i} transform={`translate(${x} ${y})`}><circle r="17" /><text textAnchor="middle" y="6">{letters[i]}</text></g>)}<path className="nc-isolate-ring" d="M303 235a32 32 0 1 0 64 0a32 32 0 1 0-64 0" /><text className="nc-map-note" x="275" y="285">F: no route from A</text></svg><p>F is still<br /><em>part of the graph.</em></p><span className="nc-station-ticket">NO PATH ≠ NO NODE</span></div></div><div className="nc-station-ticker"><span>0 → 1 → 2 → 3</span><span>EXPAND ONE HOP AT A TIME</span><span>∞ = UNREACHABLE</span></div></div>;
+  return <div className="nc-station-stage nc-art" data-sequence-stage aria-hidden="true"><div className="nc-station-bar"><span className="nc-station-symbol">↗</span><b>HOP DISTANCES</b><span>SOURCE <strong>A</strong></span><i>UNWEIGHTED SERVICE</i></div><div className="nc-station-layout"><div className="nc-departure-board"><div className="nc-departure-head"><span>DESTINATION</span><span>HOPS</span><span>STATUS</span></div>{letters.map((l, i) => <div className={`nc-departure-row ${i === 5 ? 'is-isolated' : ''}`} key={l}><div className="nc-station-destination"><span className="nc-station-node">{l}</span><span>NODE {l}</span></div><div className="nc-flap-number">{(i === 5 ? ['∞'] : distances[i].split('')).map((char, j) => <div className="nc-flap" key={j}><span className="nc-flap-base">{char}</span><span className="nc-flap-lid">–</span><i /></div>)}</div><span className="nc-station-status">{['SOURCE', 'ONE EDGE', 'ONE EDGE', 'TWO EDGES', 'THREE EDGES', 'UNREACHABLE'][i]}</span></div>)}</div><div className="nc-station-map"><span>THE ACTUAL CONNECTIONS</span><svg viewBox="0 0 390 290">{stationEdges.map(([a, b]) => <path className="nc-station-track" pathLength="1" key={`${a}-${b}`} d={`M${stationNodes[a][0]} ${stationNodes[a][1]}L${stationNodes[b][0]} ${stationNodes[b][1]}`} />)}{stationNodes.map(([x, y], i) => <g key={i} transform={`translate(${x} ${y})`}><circle r="17" /><text textAnchor="middle" y="6">{letters[i]}</text></g>)}<path className="nc-isolate-ring" d="M303 235a32 32 0 1 0 64 0a32 32 0 1 0-64 0" /><text className="nc-map-note" x="275" y="285">F: no route from A</text></svg><p>F is still<br /><em>part of the graph.</em></p><span className="nc-station-ticket">NO PATH ≠ NO NODE</span></div></div><div className="nc-station-ticker"><span>0 → 1 → 2 → 3</span><span>EXPAND ONE HOP AT A TIME</span><span>∞ = UNREACHABLE</span></div></div>;
 }
 
 const loomColors = ['#a5daef', '#8eabf5', '#b9a5e5', '#e6add5', '#f3a7b5', '#edb69c', '#dfce92', '#bdd2a0', '#9ed9c2'];
@@ -113,12 +113,12 @@ function routeD(index: number) {
 const loomNodes: [string, number, number][] = [['A', 75, 245], ['B', 270, 100], ['C', 270, 245], ['D', 270, 390], ['X', 515, 245], ['Y', 685, 245], ['E', 930, 100], ['F', 930, 245], ['G', 930, 390], ['Z', 1125, 245]];
 
 function RouteLoom() {
-  return <div className="nc-loom-stage nc-art" aria-hidden="true"><div className="nc-loom-ghost">ONE</div><div className="nc-loom-labels"><span>THREE CHOICES</span><span>SHARED BRIDGE</span><span>THREE CHOICES</span></div><svg viewBox="0 0 1200 490"><g className="nc-loom-guides">{[100, 245, 390].map(y => <path key={y} d={`M0 ${y}H1200`} />)}{[75, 270, 515, 685, 930, 1125].map(x => <path key={x} d={`M${x} 45V440`} />)}</g><g className="nc-loom-ribbons">{loomColors.map((color, i) => <g className="nc-route-ribbon" key={color}><path className="nc-ribbon-shadow" d={routeD(i)} /><path className="nc-ribbon-path" pathLength="1" d={routeD(i)} stroke={color} /><path className="nc-ribbon-shine" pathLength="1" d={routeD(i)} /></g>)}</g><g className="nc-bridge-focus"><rect x="486" y="205" width="228" height="80" rx="40" /><path d="M530 190V170H670V190M530 300V320H670V300" /><text x="600" y="151" textAnchor="middle">ALL 9 CROSS HERE</text><text x="600" y="350" textAnchor="middle">X — Y</text></g>{loomNodes.map(([l, x, y]) => <g className={`nc-loom-node ${l === 'A' || l === 'Z' ? 'is-terminal' : ''}`} key={l} transform={`translate(${x} ${y})`}><circle r={l === 'A' || l === 'Z' ? 24 : 15} /><text textAnchor="middle" y="6">{l}</text></g>)}{loomColors.map((color, i) => <circle className="nc-route-courier" data-route={i} key={color} cx="75" cy="245" r="5.5" fill={color} />)}</svg><div className="nc-loom-equation"><div><strong>3 × 3</strong><span>BRANCH COMBINATIONS</span></div><b>=</b><div><strong>9</strong><span>SHORTEST A–Z PATHS</span></div><b>→</b><div><strong>1</strong><span>BRIDGE THEY ALL NEED</span></div></div></div>;
+  return <div className="nc-loom-stage nc-art" data-sequence-stage aria-hidden="true"><div className="nc-loom-ghost">ONE</div><div className="nc-loom-labels"><span>THREE CHOICES</span><span>SHARED BRIDGE</span><span>THREE CHOICES</span></div><svg viewBox="0 0 1200 490"><g className="nc-loom-guides">{[100, 245, 390].map(y => <path key={y} d={`M0 ${y}H1200`} />)}{[75, 270, 515, 685, 930, 1125].map(x => <path key={x} d={`M${x} 45V440`} />)}</g><g className="nc-loom-ribbons">{loomColors.map((color, i) => <g className="nc-route-ribbon" key={color}><path className="nc-ribbon-shadow" d={routeD(i)} /><path className="nc-ribbon-path" pathLength="1" d={routeD(i)} stroke={color} /><path className="nc-ribbon-shine" pathLength="1" d={routeD(i)} /></g>)}</g><g className="nc-bridge-focus"><rect x="486" y="205" width="228" height="80" rx="40" /><path d="M530 190V170H670V190M530 300V320H670V300" /><text x="600" y="151" textAnchor="middle">ALL 9 CROSS HERE</text><text x="600" y="350" textAnchor="middle">X — Y</text></g>{loomNodes.map(([l, x, y]) => <g className={`nc-loom-node ${l === 'A' || l === 'Z' ? 'is-terminal' : ''}`} key={l} transform={`translate(${x} ${y})`}><circle r={l === 'A' || l === 'Z' ? 24 : 15} /><text textAnchor="middle" y="6">{l}</text></g>)}{loomColors.map((color, i) => <circle className="nc-route-courier" data-route={i} key={color} cx="75" cy="245" r="5.5" fill={color} />)}</svg><div className="nc-loom-equation"><div><strong>3 × 3</strong><span>BRANCH COMBINATIONS</span></div><b>=</b><div><strong>9</strong><span>SHORTEST A–Z PATHS</span></div><b>→</b><div><strong>1</strong><span>BRIDGE THEY ALL NEED</span></div></div></div>;
 }
 
-function makeTimeline(root: HTMLElement, scene: Scene, onUpdate: () => void) {
+function makeTimeline(root: HTMLElement, scene: Scene) {
   const q = (selector: string) => Array.from(root.querySelectorAll<HTMLElement | SVGElement>(selector));
-  const timeline = gsap.timeline({ paused: true, defaults: { ease: 'power2.inOut' }, onUpdate });
+  const timeline = gsap.timeline({ paused: true, defaults: { ease: 'power2.inOut' } });
   const draw = (selector: string, at: number, duration = 1.5, stagger = .05) => { const targets = q(selector); if (targets.length) timeline.fromTo(targets, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration, stagger }, at); };
   if (scene === '1-middle') {
     timeline.fromTo(q('.nc-paper-panel'), { rotationY: i => i % 2 ? 76 : -76, y: 80, z: -100 }, { rotationY: 0, y: 0, z: 0, duration: 2.5, stagger: .35 }, 0);
@@ -194,80 +194,34 @@ function Episode({ week, reduced, variant }: Props) {
   const script = scripts[scene];
   const root = useRef<HTMLElement>(null);
   const reading = useRef<HTMLOutputElement>(null);
-  const pauseButton = useRef<HTMLButtonElement>(null);
-  const replay = useRef<() => void>(() => {});
-  const pause = useRef<() => void>(() => {});
+  const lastAct = useRef(-1);
   const [staticAct, setStaticAct] = useState(2);
   const titleId = useId();
-
-  useEffect(() => {
+  const build = useCallback((el: HTMLElement) => makeTimeline(el, scene), [scene]);
+  const onProgress = useCallback((p: number) => {
     const el = root.current;
-    if (!el || reduced) return;
-    let mode: 'scroll' | 'replay' | 'hold' = 'scroll';
-    let visible = el.getBoundingClientRect().top < innerHeight && el.getBoundingClientRect().bottom > 0;
-    let lastScroll = window.scrollY;
-    let lastAct = -1;
-    let timeline: gsap.core.Timeline;
-    let trigger: ScrollTrigger;
-    const report = () => {
-      if (!timeline) return;
-      const p = timeline.progress();
-      const act = Math.min(2, Math.floor(p * 3));
-      el.dataset.ncProgress = p.toFixed(3);
-      el.dataset.ncPhase = String(act + 1);
-      el.dataset.ncMode = mode;
-      el.dataset.ncPlaying = String(mode === 'replay' && !timeline.paused() && visible && !document.hidden);
-      el.style.setProperty('--nc-progress', String(p));
-      if (pauseButton.current) pauseButton.current.disabled = mode !== 'replay';
-      if (lastAct !== act) {
-        lastAct = act;
-        if (reading.current) reading.current.textContent = `${script.acts[act].title} — ${script.acts[act].detail}`;
-        el.querySelectorAll<HTMLElement>('.nc-act').forEach((node, i) => { node.dataset.active = String(i === act); });
-      }
-    };
-    const context = gsap.context(() => {
-      timeline = makeTimeline(el, scene, report);
-      timeline.eventCallback('onComplete', () => { if (mode === 'replay') mode = 'hold'; report(); });
-      trigger = ScrollTrigger.create({ trigger: el, start: 'top 80%', end: 'bottom 55%', onUpdate(self) {
-        const moved = Math.abs(window.scrollY - lastScroll) > .5;
-        lastScroll = window.scrollY;
-        if (moved && mode !== 'scroll') mode = 'scroll';
-        if (mode === 'scroll' && visible && !document.hidden) timeline.pause().progress(self.progress);
-        report();
-      } });
-      timeline.progress(trigger.progress).pause();
-      report();
-    }, el);
-    const synchronize = () => {
-      if (!visible || document.hidden) timeline.pause();
-      else if (mode === 'replay') timeline.play();
-      else if (mode === 'scroll') timeline.progress(trigger.progress).pause();
-      report();
-    };
-    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; synchronize(); }, { threshold: .01 });
-    observer.observe(el);
-    document.addEventListener('visibilitychange', synchronize);
-    replay.current = () => { mode = 'replay'; timeline.pause(0); if (visible && !document.hidden) timeline.play(); report(); };
-    pause.current = () => { mode = 'hold'; timeline.pause(); report(); };
-    return () => {
-      observer.disconnect();
-      document.removeEventListener('visibilitychange', synchronize);
-      replay.current = () => {};
-      pause.current = () => {};
-      trigger.kill();
-      context.revert();
-    };
-  }, [reduced, scene, script]);
+    if (!el) return;
+    const act = Math.min(2, Math.floor(p * 3));
+    el.dataset.ncProgress = p.toFixed(3);
+    el.dataset.ncPhase = String(act + 1);
+    el.style.setProperty('--nc-progress', String(p));
+    if (lastAct.current !== act) {
+      lastAct.current = act;
+      if (reading.current) reading.current.textContent = `${script.acts[act].title} — ${script.acts[act].detail}`;
+      el.querySelectorAll<HTMLElement>('.nc-act').forEach((node, i) => { node.dataset.active = String(i === act); });
+    }
+  }, [script]);
+  const { paused, togglePause, restart } = useVisibleSequence({ root, reduced, build, onProgress });
 
   const Components = { '1-middle': PaperWorld, '1-closing': MatrixPress, '2-middle': ChanceCascade, '2-closing': TicketFactory, '3-middle': DistanceStation, '3-closing': RouteLoom };
   const Art = Components[scene];
   const act = reduced ? staticAct : 0;
-  return <section ref={root} className={`network-choreography nc-${scene} ${reduced ? 'nc-reduced' : ''}`} aria-labelledby={titleId} data-nc-scene={scene} data-nc-progress={reduced ? '1.000' : '0.000'} data-nc-phase={act + 1} data-nc-mode={reduced ? 'static' : 'scroll'} data-nc-playing="false">
-    <header className="nc-heading"><div><span className="nc-eyebrow">{script.eyebrow}</span><h2 id={titleId}>{script.title}</h2></div><p>{script.intro}</p></header>
+  return <section ref={root} className={`network-choreography nc-${scene} ${reduced ? 'nc-reduced' : ''}`} aria-labelledby={titleId} data-nc-scene={scene} data-nc-progress={reduced ? '1.000' : '0.000'} data-nc-phase={act + 1} data-nc-mode={reduced ? 'static' : 'autoplay'}>
+    <header className="nc-heading"><div><span className="nc-eyebrow">{script.eyebrow}</span><h2 id={titleId}>{script.title}</h2></div><div className="nc-heading-aside"><p>{script.intro}</p>{!reduced && <div className="sequence-playback"><span>Plays while in view</span><button type="button" onClick={togglePause} aria-pressed={paused}>{paused ? 'Resume' : 'Pause'}</button><button type="button" onClick={restart}>Restart</button></div>}</div></header>
     <Art />
     <div className="nc-reading-rail"><div className="nc-acts">{script.acts.map((item, i) => <div className="nc-act" data-active={i === act} key={item.title}><span>0{i + 1}</span><b>{item.title}</b></div>)}</div><div className="nc-progress-track"><i /></div></div>
-    <div className="nc-controls"><div className="nc-buttons"><button type="button" onClick={() => reduced ? setStaticAct(n => (n + 1) % 3) : replay.current()}><span aria-hidden="true">{reduced ? '↗' : '↻'}</span>{reduced ? 'Read next step' : script.action}</button>{!reduced && <button ref={pauseButton} type="button" className="nc-pause" onClick={() => pause.current()} disabled>Pause replay</button>}</div><output ref={reading} aria-live={reduced ? 'polite' : 'off'}>{script.acts[act].title} — {script.acts[act].detail}</output></div>
-    <p className="nc-evidence"><span>{reduced ? 'Static view' : 'Scroll to explore · Replay anytime'}</span>{script.note}</p>
+    <div className="nc-controls"><div className="nc-buttons"><button type="button" onClick={() => reduced ? setStaticAct(n => (n + 1) % 3) : restart()}><span aria-hidden="true">{reduced ? '↗' : '↻'}</span>{reduced ? 'Read next step' : script.action}</button></div><output ref={reading} aria-live={reduced ? 'polite' : 'off'}>{script.acts[act].title} — {script.acts[act].detail}</output></div>
+    <p className="nc-evidence"><span>{reduced ? 'Static view' : 'Plays while in view · Pause anytime'}</span>{script.note}</p>
   </section>;
 }
 

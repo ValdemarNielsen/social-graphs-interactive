@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './story-experience.css';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-gsap.registerPlugin(ScrollTrigger);
+import { useVisibleSequence } from './useVisibleSequence';
 
 export function Mark(){return <svg viewBox="0 0 32 32" aria-hidden="true"><path d="m5 23 11-18 11 18H5l11 5 11-5" fill="none" stroke="currentColor" strokeWidth="1.3"/>{[[5,23],[16,5],[27,23],[16,28]].map(([x,y])=><circle key={x+','+y} cx={x} cy={y} r="2.6" fill="currentColor"/>)}</svg>}
 
@@ -177,14 +176,10 @@ export function Story({week,reduced}:{week:number;reduced:boolean}){
  const root=useRef<HTMLDivElement>(null);
  const [act,setAct]=useState(reduced?2:0);
  const acts=sceneActs[week-1];
- useEffect(()=>{
-  const el=root.current!;
-  if(reduced){setAct(2);return;}
-  setAct(0);
-  let lastAct=0;
-  const context=gsap.context(()=>{
+ const onProgress=useCallback((progress:number)=>setAct(Math.min(2,Math.floor(progress*3))),[]);
+ const build=useCallback((el:HTMLElement)=>{
    const q=(selector:string)=>el.querySelectorAll(selector);
-   const timeline=gsap.timeline({defaults:{ease:'power2.inOut'},scrollTrigger:{trigger:el,start:'top top+=125',end:'bottom bottom',scrub:.65,invalidateOnRefresh:true,onUpdate:self=>{const next=Math.min(2,Math.floor(self.progress*3));if(next!==lastAct){lastAct=next;setAct(next);}}}});
+   const timeline=gsap.timeline({paused:true,defaults:{ease:'power2.inOut'}});
    const camera=[
     {rotationY:-34,rotationX:18,rotationZ:-5,z:-110,y:35,scale:.92},
     {rotationY:-22,rotationX:44,rotationZ:16,z:-100,y:30,scale:.9},
@@ -240,19 +235,20 @@ export function Story({week,reduced}:{week:number;reduced:boolean}){
      .to(q('.vector-ray'),{attr:{'stroke-dashoffset':0},duration:.8,stagger:.12},1.6)
      .to(q('.vector-angle'),{opacity:1,duration:.5},2.35).to(q('.vector-caption'),{opacity:1,duration:.5},2.5);
    }
-  },el);
-  return()=>{context.revert();const ship=el.querySelector('.shortcut-ship');ship?.setAttribute('transform','translate(360 93)');};
- },[week,reduced]);
+   return gsap.timeline({paused:true}).add(timeline.paused(false).timeScale(timeline.duration()/7.5));
+ },[week]);
+ const {paused,togglePause,restart}=useVisibleSequence({root,reduced,build,onProgress});
  return <div ref={root} className={`story cinematic-story story-${week} ${reduced?'static':''}`} data-act={act}>
   <div className="story-sticky cinematic-sticky">
    <div className="story-atmosphere" aria-hidden="true"/><div className="story-ghost-number" aria-hidden="true">0{week}</div>
    <div className="story-topline"><span><i/> A change in perspective</span><span>SCENE 0{week} / 06</span></div>
+   <div className="sequence-playback"><span>{reduced?'Still view · reduced motion':'Repeats while this artwork is in view'}</span>{!reduced&&<div><button type="button" aria-pressed={paused} onClick={togglePause}>{paused?'Resume':'Pause'}</button><button type="button" onClick={restart}>Restart ↻</button></div>}</div>
    <div className="story-composition">
     <div className="cinematic-copy"><p className="eyebrow">{['Representation','Small worlds','Distance & reach','Community structure','Tokens & types','Vector spaces'][week-1]}</p>
      <div className="story-act-stack">{acts.map((item,i)=><div key={item.label} className={`story-act ${act===i?'is-current':''}`} aria-hidden={act!==i}><h2>{item.title.split('|').map((line,j)=><span key={line}>{j===1?<em>{line}</em>:line}</span>)}</h2><p>{item.body}</p></div>)}</div>
      <div className="story-readout"><span className="readout-icon" aria-hidden="true">⌁</span><div><span className="readout-label">The observation</span><p>{acts[act].reading}</p></div></div>
     </div>
-    <div className="story-stage-perspective">{(week===2||week===3)&&<div className="story-orbit-cage" aria-hidden="true"><i/><i/><i/><i/></div>}<div className="story-glass-back" aria-hidden="true"/><div className="story-glass-middle" aria-hidden="true"/>
+    <div className="story-stage-perspective" data-sequence-stage="">{(week===2||week===3)&&<div className="story-orbit-cage" aria-hidden="true"><i/><i/><i/><i/></div>}<div className="story-glass-back" aria-hidden="true"/><div className="story-glass-middle" aria-hidden="true"/>
      <div className="story-glass-front"><div className="story-glass-sheen" aria-hidden="true"/><div className="story-stage-header"><span className="stage-dot"/><span>{stageTitles[week-1]}</span><span className="stage-coordinate">FIG. 0{week}</span></div>
       <svg className="cinematic-svg" viewBox="0 0 720 500" role="img" aria-label={`${stageTitles[week-1]}. ${acts[2].body}`}><title>{stageTitles[week-1]}</title>
        {week===1?<MatrixScene still={reduced}/>:week===2?<ShortcutScene still={reduced}/>:week===3?<BfsScene still={reduced}/>:week===4?<CommunityScene still={reduced}/>:week===5?<LanguageScene still={reduced}/>:<VectorScene still={reduced}/>}
@@ -261,7 +257,7 @@ export function Story({week,reduced}:{week:number;reduced:boolean}){
      <div className="story-floating-label" aria-hidden="true"><span>0{week}</span><i/>{['relationships','shortcuts','reach','belonging','language','meaning'][week-1]}</div>
     </div>
    </div>
-   <div className="story-bottomline"><div className="story-acts" aria-label="Three acts in this visual explanation">{acts.map((item,i)=><div key={item.label} className={i===act?'is-current':''}><span>0{i+1}</span><p>{item.label}</p></div>)}</div><span className="story-scroll-note">{reduced?'STILL VIEW / MOTION REDUCED':'SCROLL TO CHANGE PERSPECTIVE'} <span aria-hidden="true">↓</span></span></div>
+   <div className="story-bottomline"><div className="story-acts" aria-label="Three acts in this visual explanation">{acts.map((item,i)=><div key={item.label} className={i===act?'is-current':''}><span>0{i+1}</span><p>{item.label}</p></div>)}</div><span className="story-scroll-note">{reduced?'STILL VIEW / MOTION REDUCED':'AUTOPLAY · PAUSE TO READ'}</span></div>
    <div className="cinematic-progress" aria-hidden="true"><span className="story-progress-fill"/></div>
   </div>
  </div>;

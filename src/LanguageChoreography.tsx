@@ -1,13 +1,11 @@
-import { useId, useLayoutEffect, useRef } from 'react';
+import { useCallback, useId, useRef } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { tokenize } from './math';
+import { useVisibleSequence } from './useVisibleSequence';
 import './language-choreography.css';
 
-gsap.registerPlugin(ScrollTrigger);
 type Props = { week: 4 | 5 | 6; reduced: boolean; variant: 'middle' | 'closing' };
 type SceneName = 'map' | 'loom' | 'press' | 'wall' | 'lens' | 'book';
-type Controls = { replay: () => void; select: (phase: number) => void };
 
 const studies = {
   map: { title: 'Fold the territory. Keep the evidence.', intro: 'A partition changes how we see a network. The relationships underneath deserve another look.', phases: ['A compact view', 'Unfold the territory', 'Question the border'], note: 'A paper-folding metaphor for community partitions. The invented map does not encode geographic observations, a calculated partition, or a modularity score.', source: 'https://tympanus.net/codrops/2022/12/13/how-to-code-an-on-scroll-folding-3d-cardboard-box-animation-with-three-js-and-gsap/', sourceTitle: 'Codrops · folding a three-dimensional paper form' },
@@ -192,62 +190,44 @@ export default function LanguageChoreography({ week, variant, reduced }: Props) 
   const name: SceneName = week === 4 ? variant === 'middle' ? 'map' : 'loom' : week === 5 ? variant === 'middle' ? 'press' : 'wall' : variant === 'middle' ? 'lens' : 'book';
   const study = studies[name];
   const rootRef = useRef<HTMLElement>(null);
-  const controls = useRef<Controls>({ replay: () => {}, select: () => {} });
+  const lastFrame = useRef({ percent: -1, phase: -1 });
   const uid = `lc-${useId().replaceAll(':', '')}`;
 
-  useLayoutEffect(() => {
+  const build = useCallback((root: HTMLElement) => {
+    lastFrame.current = { percent: -1, phase: -1 };
+    return buildSequence(root, name);
+  }, [name]);
+  const onProgress = useCallback((progress: number) => {
     const root = rootRef.current;
     if (!root) return;
-    let trigger: ScrollTrigger | undefined, replayTween: gsap.core.Tween | undefined;
-    let mode: 'scroll' | 'playing' | 'manual' = 'scroll';
-    let lastPercent = -1, lastPhase = -1, replayScroll = 0, intersects = true;
-    const proxy = { progress: reduced ? 1 : 0 };
-    const buttons = [...root.querySelectorAll<HTMLButtonElement>('.lc-phase-button')];
-    const output = root.querySelector<HTMLOutputElement>('.lc-phase-output');
-    const bar = root.querySelector<HTMLElement>('.lc-motion-meter > span');
-    let draw = () => {};
-    const context = gsap.context(() => {
-      const timeline = buildSequence(root, name);
-      draw = () => {
-        const p = Math.max(0, Math.min(1, proxy.progress));
-        timeline.progress(p).pause();
-        const percent = Math.round(p * 100), phase = Math.min(2, Math.floor(p * 3));
-        if (percent !== lastPercent) { lastPercent = percent; root.dataset.progress = (percent / 100).toFixed(2); if (bar) bar.style.transform = `scaleX(${p})`; }
-        if (phase !== lastPhase) { lastPhase = phase; root.dataset.phase = String(phase + 1); buttons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === phase))); if (output) output.textContent = `${String(phase + 1).padStart(2, '0')} / ${study.phases[phase]}`; }
-      };
-      draw();
-      const select = (phase: number) => {
-        replayTween?.kill(); gsap.killTweensOf(proxy); mode = 'manual';
-        root.dataset.replay = reduced ? 'still' : 'selected';
-        const progress = [.04, .55, 1][phase];
-        if (reduced) { proxy.progress = progress; draw(); }
-        else replayTween = gsap.to(proxy, { progress, duration: .7, ease: 'power2.inOut', onUpdate: draw, paused: document.hidden || !intersects });
-      };
-      controls.current = {
-        select,
-        replay: () => {
-          if (reduced) { select((lastPhase + 1) % 3); return; }
-          gsap.killTweensOf(proxy); replayTween?.kill(); mode = 'playing'; replayScroll = window.scrollY;
-          root.dataset.replay = 'playing'; proxy.progress = 0; draw();
-          replayTween = gsap.to(proxy, { progress: 1, duration: 5, ease: 'none', onUpdate: draw, paused: document.hidden || !intersects, onComplete: () => { mode = 'manual'; root.dataset.replay = 'complete'; } });
-        },
-      };
-      if (!reduced) trigger = ScrollTrigger.create({ trigger: root, start: 'top 78%', end: 'bottom 35%', invalidateOnRefresh: true, onUpdate: self => {
-        if (mode === 'playing' && Math.abs(window.scrollY - replayScroll) < 70) return;
-        if (mode !== 'scroll') { replayTween?.kill(); mode = 'scroll'; root.dataset.replay = 'scroll'; }
-        replayTween = gsap.to(proxy, { progress: self.progress, duration: .3, ease: 'none', overwrite: true, onUpdate: draw, paused: document.hidden || !intersects });
-      } });
-    }, root);
-    const syncPlayback = () => { if (document.hidden || !intersects) replayTween?.pause(); else replayTween?.resume(); };
-    const observer = new IntersectionObserver(([entry]) => { intersects = entry.isIntersecting; syncPlayback(); }, { threshold: .01 });
-    observer.observe(root); document.addEventListener('visibilitychange', syncPlayback);
-    return () => { observer.disconnect(); document.removeEventListener('visibilitychange', syncPlayback); replayTween?.kill(); gsap.killTweensOf(proxy); trigger?.kill(); context.revert(); controls.current = { replay: () => {}, select: () => {} }; };
-  }, [name, reduced, study]);
+    const p = Math.max(0, Math.min(1, progress));
+    const percent = Math.round(p * 100), phase = Math.min(2, Math.floor(p * 3));
+    if (percent !== lastFrame.current.percent) {
+      lastFrame.current.percent = percent;
+      root.dataset.progress = (percent / 100).toFixed(2);
+      const bar = root.querySelector<HTMLElement>('.lc-motion-meter > span');
+      if (bar) bar.style.transform = `scaleX(${p})`;
+    }
+    if (phase !== lastFrame.current.phase) {
+      lastFrame.current.phase = phase;
+      root.dataset.phase = String(phase + 1);
+      root.querySelectorAll<HTMLButtonElement>('.lc-phase-button').forEach((button, i) => button.setAttribute('aria-pressed', String(i === phase)));
+      const output = root.querySelector<HTMLOutputElement>('.lc-phase-output');
+      if (output) output.textContent = `${String(phase + 1).padStart(2, '0')} / ${study.phases[phase]}`;
+    }
+  }, [study]);
+  const { paused, togglePause, restart, select } = useVisibleSequence({ root: rootRef, reduced, build, onProgress });
+  const selectPhase = (phase: number) => select([.04, .55, 1][phase]);
 
-  return <section ref={rootRef} className={`language-choreography lc-${name}`} data-scene={`${week}-${variant}-${name}`} data-phase={reduced ? '3' : '1'} data-progress={reduced ? '1.00' : '0.00'} data-replay={reduced ? 'still' : 'scroll'} data-reduced={reduced} aria-labelledby={`${uid}-title`}>
+  return <section ref={rootRef} className={`language-choreography lc-${name}`} data-scene={`${week}-${variant}-${name}`} data-phase={reduced ? '3' : '1'} data-progress={reduced ? '1.00' : '0.00'} data-replay={reduced ? 'still' : paused ? 'paused' : 'automatic'} data-reduced={reduced} aria-labelledby={`${uid}-title`}>
     <header className="lc-heading"><div><p className="lc-eyebrow">A change of perspective / 0{week}</p><h3 id={`${uid}-title`}>{study.title}</h3></div><p>{study.intro}</p></header>
-    <div className="lc-stage" aria-hidden="true">{name === 'map' ? <FoldingMap /> : name === 'loom' ? <CommunityLoom id={uid} /> : name === 'press' ? <TypePress id={uid} /> : name === 'wall' ? <TypeWall id={uid} /> : name === 'lens' ? <LenticularMeaning /> : <DocumentBook />}</div>
-    <div className="lc-controls"><button type="button" className="lc-replay" onClick={() => controls.current.replay()}>{reduced ? 'Next still view' : 'Replay the sequence'}<span aria-hidden="true">↻</span></button><ol>{study.phases.map((label, i) => <li key={label}><button type="button" className="lc-phase-button" aria-pressed={reduced ? i === 2 : i === 0} onClick={() => controls.current.select(i)}><span>{String(i + 1).padStart(2, '0')}</span>{label}</button></li>)}</ol><output className="lc-phase-output" aria-live="polite">{reduced ? '03' : '01'} / {study.phases[reduced ? 2 : 0]}</output><div className="lc-motion-meter" aria-hidden="true"><span /></div></div>
+    <div className="sequence-playback lc-playback">
+      {!reduced && <button type="button" className="lc-pause" onClick={togglePause} aria-pressed={paused}>{paused ? 'Resume animation' : 'Pause animation'}</button>}
+      <button type="button" className="lc-replay" onClick={reduced ? () => selectPhase((lastFrame.current.phase + 1) % 3) : restart}>{reduced ? 'Next still view' : 'Replay the sequence'}<span aria-hidden="true">↻</span></button>
+      <span className="sequence-playback-label">{reduced ? 'Still views · reduced motion' : 'Plays while in view'}</span>
+    </div>
+    <div className="lc-stage" data-sequence-stage aria-hidden="true">{name === 'map' ? <FoldingMap /> : name === 'loom' ? <CommunityLoom id={uid} /> : name === 'press' ? <TypePress id={uid} /> : name === 'wall' ? <TypeWall id={uid} /> : name === 'lens' ? <LenticularMeaning /> : <DocumentBook />}</div>
+    <div className="lc-controls lc-phase-controls"><ol>{study.phases.map((label, i) => <li key={label}><button type="button" className="lc-phase-button" aria-pressed={reduced ? i === 2 : i === 0} onClick={() => selectPhase(i)}><span>{String(i + 1).padStart(2, '0')}</span>{label}</button></li>)}</ol><output className="lc-phase-output" aria-live={reduced ? 'polite' : 'off'}>{reduced ? '03' : '01'} / {study.phases[reduced ? 2 : 0]}</output><div className="lc-motion-meter" aria-hidden="true"><span /></div></div>
     <details className="lc-reference-notes"><summary>About this motion study</summary><p>{study.note}</p><p>Original graphics and animation. Inspiration: <a href={study.source} target="_blank" rel="noreferrer">{study.sourceTitle} ↗</a>. No reference assets or demo code are included.</p>{name === 'book' && <p>Additional material reference: <a href="https://tympanus.net/Development/AnimatedBooks/" target="_blank" rel="noreferrer">Codrops · animated books with CSS 3D transforms ↗</a>.</p>}</details>
   </section>;
 }

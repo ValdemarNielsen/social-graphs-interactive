@@ -89,4 +89,10 @@ The other new mechanisms are a flip-tile adjacency instrument, an enumeration of
 
 Spider-Man now makes one approach, pull, hold and release. The same eased playhead determines the character, letters and attached webs; the limp arc remains, but the underdamped letter springs and repeated character recoil are removed. Cached untransformed measurements also avoid temporarily clearing live transforms during resize. Replay, reverse scrolling, still mode and offscreen/hidden suspension remain supported.
 
-New sequences have finite replay and local state, with no extra pinned blank scrolling. Their layouts are lazy loaded behind independent visual error boundaries. A shared layout observer refreshes scroll ranges after asynchronous content changes height. Reduced motion keeps static views and explanatory controls; no study paragraph is hidden by the new animations.
+The original third-pass sequences used finite replay and local scroll state. Their layouts are lazy loaded behind independent visual error boundaries. A shared layout observer refreshes scroll ranges after asynchronous content changes height. Reduced motion keeps static views and explanatory controls; no study paragraph is hidden by the new animations.
+
+## Visible playback revision — 19 October 2026
+
+Feedback exposed a practical problem: a scroll-scrubbed sequence could reach its conclusion only after the reader had scrolled the artwork offscreen. The chapter stories and all twenty-four episodes now use one shared visibility-gated playback controller. Most of the artwork must be visible below the fixed navigation before its clock starts. Each completed sequence holds for two seconds, fades out briefly, resets, then returns for another pass. Leaving view or hiding the tab pauses the clock; scrolling cannot override a manual pause.
+
+Pause/resume and restart controls sit above the art. The six chapter stories no longer require a multi-viewport pinned scroll track. Scene-index jumps align the control strip and artwork; short viewport layouts bound the art height. Interlude loops animate visual accents only: graph edits, corpus selection, partition choices and other numerical actions still require the reader's explicit input. Reduced motion shows complete still artwork with the existing explanatory controls.

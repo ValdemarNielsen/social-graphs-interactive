@@ -98,3 +98,15 @@ Final production-preview checks confirmed the A, A, A, B, C, D conveyor tickets,
 The corrected map's folded panels fit inside its 430 px stage. The book fan's five final pages also fit within that height, and selecting its first and final still views worked. There was no horizontal overflow on the tested week 6 page. The compact comic now measures 794 px overall, with a 455 px artwork area, at 1440×900.
 
 In the production home page, scrolling forward reached progress 0.999 toward 1.000; reversing to the top restored progress 0.000 and stopped the animation loop. The final production inspection tab reported no console warnings or errors. This revision does not claim a physical-device or screen-reader audit.
+
+## Visible autoplay revision — 19 October 2026
+
+The chapter stories and twenty-four episodes now run on a visibility-gated loop, with a two-second final hold. New unit checks cover fixed-navigation occlusion, tall scenes, short viewports and hysteresis at the visibility boundary. All 16 tests pass. An independent actual-GSAP check also covered three resets and selecting a phase before resuming; this was a focused local check, not a new browser test suite.
+
+At 1280×720, the document scene's art occupied y=232–662 after a scene-index jump. With no further scrolling it reached progress 1.000, then began another cycle. Pause held progress 0.469 despite scrolling away and returning. Resume advanced it to 0.619. After jumping to another scene, it stopped at 0.628 and remained there during later checks. The lenticular scene independently began its second cycle. The chapter story reached its final act and repeated twice while its artwork remained within y=224–616.
+
+The production build's reduced-motion toggle put all five sequence instances in the tested chapter into reduced mode at progress 1.000. The preferential-attachment teaching episode fit within y=211–557. Its explicit action changed five nodes/seven edges to six nodes/nine edges; automatic loops do not trigger that action or alter the data.
+
+The final compact network layouts were checked at 1280×720: the probability stage occupied y=208–638, including all four outcome bins, and repeated without scrolling; the conveyor stage also measured 430 px, with its odds readout ending at y=580. The complete six-row distance board ended at y=578 inside its 430 px stage, reached the final act and began another cycle. The final inspection tab had no console warnings/errors or horizontal overflow. A stalled automation tab was replaced during these checks.
+
+The final TypeScript/production build passes. Main JavaScript is 572.07 kB (195.92 kB gzip); the existing bundle-size advisory remains. No dependency or numerical-laboratory change was introduced. These are desktop browser checks, not a physical-device or screen-reader audit.

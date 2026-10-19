@@ -16,7 +16,9 @@ const sceneNames = [
 ];
 const anchors = ['chapter-opening', 'chapter-story', 'episode-before-study', 'chapter-middle', 'episode-after-study', 'chapter-closing'];
 function jump(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: document.documentElement.dataset.reduced === 'true' ? 'instant' : 'smooth', block: 'start' });
+  const section = document.getElementById(id);
+  const target = section?.querySelector('.sequence-playback') ?? section;
+  target?.scrollIntoView({ behavior: document.documentElement.dataset.reduced === 'true' ? 'instant' : 'smooth', block: 'start' });
 }
 
 export function SceneIndex({ week }: { week: number }) {

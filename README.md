@@ -1,10 +1,12 @@
 # Social Graphs — an interactive field guide
 
-A standalone React, TypeScript and Vite learning companion to [Sune Lehmann’s 2026 Social Graphs and Interactions course, DTU 02805](https://sunelehmann.com/socialgraphs2026-web/index.html#weeks). Six independent chapter pages combine live mathematical experiments, study notes and exercise briefs with **six distinct chapter covers, six scroll stories and twenty-four interactive visual episodes**.
+A standalone React, TypeScript and Vite learning companion to [Sune Lehmann’s 2026 Social Graphs and Interactions course, DTU 02805](https://sunelehmann.com/socialgraphs2026-web/index.html#weeks). Six independent chapter pages combine live mathematical experiments, study notes and exercise briefs with **six distinct chapter covers, six animated stories and twenty-four interactive visual episodes**.
 
 The home scene uses an original SVG Spider-Man drawing to pull connected typography, with one smoothed, reversible pull-and-release playhead. Its hanging letters derive from the same pose, avoiding independent spring wobble. The chapter openings now include a woven three-dimensional filament knot, an exploding chrome mechanism, a bending transit tunnel, merging iridescent liquid forms, particle typography, and the original week 6 glass sculpture. Canvas scenes use perspective projection; the chrome, liquid and glass use custom WebGL raymarching. These are illustrative compositions with approximate optical effects, not measured networks or physically validated optical simulations.
 
-Twelve additional full-width scenes now interrupt the study notes and follow the exercises: a hinged comic, flip-tile matrix, probability cascade, popularity conveyor, departure board, route ribbons, folding map, weaving loom, printing press, fractured type wall, lenticular context panels and document scanner. Each chapter has a six-scene index, replay controls and a reduced-motion presentation.
+Twelve additional full-width scenes now interrupt the study notes and follow the exercises: a hinged comic, flip-tile matrix, probability cascade, popularity conveyor, departure board, route ribbons, folding map, weaving loom, printing press, fractured type wall, lenticular context panels and document scanner. Each chapter has a six-scene index, prominent playback controls and a reduced-motion presentation.
+
+Chapter stories and episodes automatically play while their artwork is clearly visible, hold the finished composition for two seconds, then gently reset and repeat. Scrolling no longer drives these timelines. Pause/resume and restart sit above the artwork; offscreen or hidden scenes stop advancing. Scene jumps frame the playback controls and artwork together. Numerical teaching actions stay under the reader's control, and reduced motion provides still views. The home Spider-Man sequence retains its fitted sticky scroll stage.
 
 This project lives in its own repository, **[ValdemarNielsen/social-graphs-interactive](https://github.com/ValdemarNielsen/social-graphs-interactive)**, with its own GitHub Pages deployment. It does not require or modify another project.
 
@@ -27,7 +29,7 @@ npm run build
 npm run preview
 ```
 
-The preview normally runs at `http://127.0.0.1:4173`. Serve `dist/` through an HTTP server; do not open its HTML directly with a `file:` URL. `npm run build` includes TypeScript checking. `npm test` runs deterministic calculation tests. These commands document how to verify the project; observed browser and performance results are reported separately in the delivery QA notes.
+The preview normally runs at `http://127.0.0.1:4173`. Serve `dist/` through an HTTP server; do not open its HTML directly with a `file:` URL. `npm run build` includes TypeScript checking. `npm test` runs deterministic calculation and animation-visibility tests. These commands document how to verify the project; observed browser and performance results are reported separately in the delivery QA notes.
 
 ## Course coverage
 

@@ -1,10 +1,8 @@
-import { useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useVisibleSequence } from './useVisibleSequence';
 import { adjacencyList, barabasiAlbert, bfsDistances, connectedComponents, countTokens, degrees, disparityAlpha, erdosRenyi, modularity, tfidf, tokenize, type Edge } from './math';
 import './chapter-interlude.css';
-
-gsap.registerPlugin(ScrollTrigger);
 
 type EpisodeProps = { reduced: boolean };
 type Point = { x: number; y: number };
@@ -17,58 +15,56 @@ function ring(n: number, radius = 145, cx = 380, cy = 218): Point[] {
   return Array.from({ length: n }, (_, i) => ({ x: cx + Math.cos(i * Math.PI * 2 / n - Math.PI / 2) * radius, y: cy + Math.sin(i * Math.PI * 2 / n - Math.PI / 2) * radius }));
 }
 
-/** Each SVG is an independent, finite animation. Updating a teaching control
- * replays the ink/packet accents; the actual state remains React-owned. */
+/** The accents repeat only while the artwork is visible. Teaching controls
+ * continue to own the graph, corpus, parameters, and calculated results. */
 function Scene({ children, label, reduced, change = 0, className = '' }: { children: ReactNode; label: string; reduced: boolean; change?: number | string; className?: string }) {
-  const ref = useRef<SVGSVGElement>(null);
-  const first = useRef(true);
-  const contextPositions = useRef(new Map<string, Point>());
+  const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
-  useLayoutEffect(() => {
-    if (!ref.current) return;
-    const contextEdges = new Map([...ref.current.querySelectorAll<SVGLineElement>('[data-ci-context-edge]')].map(edge => [edge.dataset.ciContextEdge, edge]));
-    const contextPairs = [...ref.current.querySelectorAll<SVGGElement>('[data-ci-context-node]')].map(node => ({
+  const build = useCallback((element: HTMLElement) => {
+    const svg = element.querySelector('svg')!;
+    const timeline = gsap.timeline({ paused: true });
+    const contextEdges = new Map([...svg.querySelectorAll<SVGLineElement>('[data-ci-context-edge]')].map(edge => [edge.dataset.ciContextEdge, edge]));
+    const contextPairs = [...svg.querySelectorAll<SVGGElement>('[data-ci-context-node]')].map(node => ({
       key: node.dataset.ciContextNode!, node, edge: contextEdges.get(node.dataset.ciContextNode),
       target: { x: Number(node.dataset.ciTargetX), y: Number(node.dataset.ciTargetY) },
     }));
-    // A single interpolated point writes the word and its edge endpoint together.
-    // This also preserves the current point when an action interrupts a tween.
+    // One point writes the word and its edge endpoint together. Only the
+    // hand-placed display position moves; the selected context stays fixed.
     const place = (pair: typeof contextPairs[number], point: Point) => {
       pair.node.setAttribute('transform', `translate(${point.x} ${point.y})`);
       pair.edge?.setAttribute('x2', String(point.x));
       pair.edge?.setAttribute('y2', String(point.y));
-      contextPositions.current.set(pair.key, { x: point.x, y: point.y });
     };
-    if (reduced) {
-      contextPairs.forEach(pair => place(pair, pair.target));
-      return;
-    }
-    const initial = first.current;
-    first.current = false;
-    const context = gsap.context(() => {
-      const timeline = gsap.timeline(initial ? { scrollTrigger: { trigger: ref.current, start: 'top 88%', once: true } } : {});
       contextPairs.forEach(pair => {
-        const point = { ...(contextPositions.current.get(pair.key) ?? pair.target) };
-        place(pair, point);
-        timeline.to(point, { ...pair.target, duration: 1.05, ease: 'power3.out', onUpdate: () => place(pair, point) }, 0);
+        const point = { x: 380 + (pair.target.x - 380) * .94, y: 210 + (pair.target.y - 210) * .94 };
+        timeline.fromTo(point, { ...point }, { ...pair.target, duration: 1.4, ease: 'power2.out', onUpdate: () => place(pair, point) }, 0);
       });
-      const strokes = ref.current!.querySelectorAll('[data-ci-stroke]');
-      if (strokes.length) timeline.fromTo(strokes, { strokeDasharray: '1 1', strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: .9, stagger: .025, ease: 'power2.inOut', clearProps: 'strokeDasharray,strokeDashoffset' }, 0);
-      const arrivals = ref.current!.querySelectorAll('[data-ci-arrive]');
-      if (arrivals.length) timeline.fromTo(arrivals, { opacity: .25 }, { opacity: 1, duration: .6, stagger: .025, ease: 'power2.out', clearProps: 'opacity' }, .12);
-      ref.current!.querySelectorAll<SVGCircleElement>('[data-ci-flight]').forEach(packet => {
+      const strokes = svg.querySelectorAll('[data-ci-stroke]');
+      if (strokes.length) timeline.fromTo(strokes, { strokeDasharray: '1 1', strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.1, stagger: .035, ease: 'power2.inOut' }, 0);
+      const arrivals = svg.querySelectorAll('[data-ci-arrive]');
+      if (arrivals.length) timeline.fromTo(arrivals, { opacity: .3 }, { opacity: 1, duration: .8, stagger: .035, ease: 'power2.out' }, .15);
+      if (!strokes.length && !arrivals.length && !contextPairs.length) {
+        const marks = [...svg.querySelectorAll('.ci-tile,.ci-letter-tile,.ci-document,.ci-type-block,.ci-map-node,.ci-weighted-link,.ci-bar')];
+        const opacity = marks.map(mark => Number.parseFloat(getComputedStyle(mark).opacity) || 1);
+        if (marks.length) timeline.fromTo(marks, { opacity: .35 }, { opacity: i => opacity[i], duration: 1.1, stagger: .04, ease: 'power2.out' }, .1);
+      }
+      svg.querySelectorAll<SVGCircleElement>('[data-ci-flight]').forEach(packet => {
         const points = (packet.dataset.ciFlight ?? '').split(';').map(pair => pair.split(',').map(Number));
         if (points.length < 2) return;
         timeline.set(packet, { attr: { cx: points[0][0], cy: points[0][1] }, opacity: 1 }, .4);
         points.slice(1).forEach(([x, y], i) => timeline.to(packet, { attr: { cx: x, cy: y }, duration: .28, ease: 'none' }, .4 + i * .28));
         timeline.to(packet, { opacity: 0, duration: .25 }, .4 + (points.length - 1) * .28);
       });
-    }, ref);
-    return () => context.revert();
-  }, [reduced, change]);
-  return <svg ref={ref} className={`ci-scene ${className}`} viewBox="0 0 760 420" role="img" aria-labelledby={titleId}>
-    <title id={titleId}>{label}</title>{children}
-  </svg>;
+      timeline.to({ reading: 0 }, { reading: 1, duration: .65 }, 2.1);
+      return gsap.timeline({ paused: true }).add(timeline.paused(false).timeScale(timeline.duration() / 4.5));
+  }, [change]);
+  const { paused, togglePause, restart } = useVisibleSequence({ root: ref, reduced, build });
+  return <div ref={ref} className="ci-visible-sequence">
+    <div className="sequence-playback"><span>{reduced ? 'Still view · reduced motion' : 'Repeats while this artwork is in view'}</span>{!reduced && <div><button type="button" aria-pressed={paused} onClick={togglePause}>{paused ? 'Resume' : 'Pause'}</button><button type="button" onClick={restart}>Restart ↻</button></div>}</div>
+    <div className="ci-artwork" data-sequence-stage=""><svg className={`ci-scene ${className}`} viewBox="0 0 760 420" role="img" aria-labelledby={titleId}>
+      <title id={titleId}>{label}</title>{children}
+    </svg></div>
+  </div>;
 }
 
 function Action({ children, onClick, pressed, disabled = false }: { children: ReactNode; onClick: () => void; pressed?: boolean; disabled?: boolean }) {
@@ -396,15 +392,6 @@ export default function ChapterInterlude({ week, reduced, variant }: ChapterInte
   const titleId = useId();
   const index = variant === 'before-study' ? 0 : 1;
   const episode = episodes[week - 1]?.[index];
-  useLayoutEffect(() => {
-    if (!ref.current || reduced) return;
-    const media = gsap.matchMedia();
-    media.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
-      gsap.fromTo(ref.current!.querySelector('.ci-folio'), { y: 36, rotation: -9 }, { y: -20, rotation: 4, ease: 'none', scrollTrigger: { trigger: ref.current, start: 'top bottom', end: 'bottom top', scrub: .6 } });
-      gsap.fromTo(ref.current!.querySelector('.ci-scene'), { y: 24, rotationX: 3, transformPerspective: 1100 }, { y: -10, rotationX: 0, ease: 'none', scrollTrigger: { trigger: ref.current, start: 'top 90%', end: 'bottom 25%', scrub: .6 } });
-    }, ref);
-    return () => media.revert();
-  }, [week, variant, reduced]);
   if (!episode) return null;
   const { Component } = episode;
   return <section id={`episode-${variant}`} ref={ref} className={`chapter-interlude ci-week-${week} ci-${index === 0 ? 'before' : 'after'}`} data-ci-reduced={reduced} aria-labelledby={titleId}>

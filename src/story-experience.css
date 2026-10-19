@@ -241,3 +241,13 @@
 .story-3 .story-orbit-cage i{border-radius:32%;border-color:#a69cdf33}
 .story.static .story-orbit-cage{display:none}
 @media(max-width:820px){.story-orbit-cage{display:none}}
+
+/* Visible playback replaces the former multi-viewport pinned scroll track. */
+.story.cinematic-story,.story.cinematic-story.static{height:auto;min-height:0;margin-block:42px 70px}
+.story.cinematic-story .cinematic-sticky,.story.cinematic-story.static .cinematic-sticky{position:relative;top:auto;height:auto;min-height:0;padding-block:18px 20px}
+.story.cinematic-story .story-topline{padding-bottom:12px}
+.story.cinematic-story .story-composition,.story.cinematic-story.static .story-composition{flex:none;padding-block:18px 28px}
+.story.cinematic-story .cinematic-svg{max-height:min(48svh,460px);min-height:0}
+.story.cinematic-story .sequence-playback{letter-spacing:0;text-transform:none}
+@media(max-width:820px){.story.cinematic-story,.story.cinematic-story.static{margin-block:25px 45px}.story.cinematic-story .cinematic-sticky,.story.cinematic-story.static .cinematic-sticky{padding-block:14px}.story.cinematic-story .story-composition,.story.cinematic-story.static .story-composition{padding-block:14px 24px;gap:20px}.story.cinematic-story .cinematic-svg{max-height:min(40svh,330px);min-height:0}.story.cinematic-story .story-bottomline{margin-top:0}}
+@media(max-height:760px) and (min-width:821px){.story.cinematic-story .cinematic-svg{max-height:43svh}.story.cinematic-story .story-act h2{font-size:clamp(36px,3.4vw,54px)}.story.cinematic-story .story-composition{padding-block:10px 20px}.story.cinematic-story .story-readout{margin-top:16px;padding-top:12px}}
