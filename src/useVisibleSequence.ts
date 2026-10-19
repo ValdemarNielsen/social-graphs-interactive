@@ -49,12 +49,12 @@ export function useVisibleSequence({ root, reduced, build, onProgress }: Options
     const context = gsap.context(() => {
       animation = build(element);
       animation.pause();
-      const duration = Math.max(1, animation.duration());
+      const duration = Math.max(1, animation.duration() * .75);
       paint();
       element.dataset.sequenceCycle = '0';
       if (!reduced) {
         loop = gsap.timeline({ paused: true, repeat: -1, onRepeat: () => { element.dataset.sequenceCycle = String(++cycles); } });
-        loop.to(proxy, { progress: 1, duration, ease: 'none', onUpdate: paint }, .3)
+        loop.to(proxy, { progress: 1, duration, ease: 'none', onUpdate: paint }, 0)
           .to({}, { duration: 2 })
           .to(stage, { opacity: 0, duration: .24, ease: 'power1.inOut' })
           .call(() => { proxy.progress = 0; paint(); })
@@ -77,7 +77,7 @@ export function useVisibleSequence({ root, reduced, build, onProgress }: Options
         select: progress => {
           manualPause = true; setPaused(true);
           const value = Math.max(0, Math.min(1, progress));
-          loop?.pause(.3 + duration * value, true);
+          loop?.pause(duration * value, true);
           stage.style.opacity = '1'; proxy.progress = value; paint();
           sync();
         },

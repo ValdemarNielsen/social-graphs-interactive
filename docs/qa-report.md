@@ -110,3 +110,7 @@ The production build's reduced-motion toggle put all five sequence instances in 
 The final compact network layouts were checked at 1280×720: the probability stage occupied y=208–638, including all four outcome bins, and repeated without scrolling; the conveyor stage also measured 430 px, with its odds readout ending at y=580. The complete six-row distance board ended at y=578 inside its 430 px stage, reached the final act and began another cycle. The final inspection tab had no console warnings/errors or horizontal overflow. A stalled automation tab was replaced during these checks.
 
 The final TypeScript/production build passes. Main JavaScript is 572.07 kB (195.92 kB gzip); the existing bundle-size advisory remains. No dependency or numerical-laboratory change was introduced. These are desktop browser checks, not a physical-device or screen-reader audit.
+
+### Earlier animation starts
+
+The initial autoplay gate was too late for ordinary scrolling. It now starts with 40 px of artwork visible, retains an 8 px exit threshold, removes the 300 ms lead-in and reduces sequence playback duration by 25%. The two-second final hold is unchanged. All 16 tests and the production build pass. At 1280×720 the probability scene remained playing with its top at y=640, leaving only 80 px on screen. Restarting there immediately advanced to progress 0.204; it no longer waits for almost the whole stage to enter. The shared phase-selection seek was adjusted to the new timing as well.
