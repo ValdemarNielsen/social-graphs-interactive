@@ -16,6 +16,23 @@ export default function MotionAtmosphere({ route, reduced }: MotionAtmospherePro
     const main = document.querySelector<HTMLElement>('#main');
     if (!main || reduced) return;
 
+    // Lazy laboratories and scenes can finish after a later scene has measured
+    // its scroll range. Refresh once the document's actual layout changes.
+    let refreshFrame = 0;
+    let previousHeight = -1;
+    const refreshLayout = () => {
+      const height = main.getBoundingClientRect().height;
+      if (Math.abs(height - previousHeight) < 1) return;
+      previousHeight = height;
+      cancelAnimationFrame(refreshFrame);
+      refreshFrame = requestAnimationFrame(() => {
+        refreshFrame = 0;
+        ScrollTrigger.refresh();
+      });
+    };
+    const resizeObserver = new ResizeObserver(refreshLayout);
+    resizeObserver.observe(main);
+
     const media = gsap.matchMedia();
     media.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', context => {
       const html = document.documentElement;
@@ -160,7 +177,11 @@ export default function MotionAtmosphere({ route, reduced }: MotionAtmospherePro
       };
     }, main);
 
-    return () => media.revert();
+    return () => {
+      resizeObserver.disconnect();
+      cancelAnimationFrame(refreshFrame);
+      media.revert();
+    };
   }, [route, reduced]);
 
   return null;

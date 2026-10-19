@@ -1,0 +1,24 @@
+.scene-index{display:grid;grid-template-columns:180px 1fr;gap:50px;padding-block:32px 40px;border-top:1px solid var(--line)}
+.scene-index>.eyebrow{font-size:10px;line-height:1.8;margin:5px 0;color:var(--accent)}
+.scene-index>.eyebrow span{color:var(--muted);font-size:8px}
+.scene-index>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 28px}
+.scene-index button{display:flex;text-align:left;align-items:baseline;gap:12px;font:11px/1.5 var(--display);padding:10px 0;border-bottom:1px solid var(--line);transition:color .2s}
+.scene-index button>span{font-size:9px;color:var(--muted)}
+.scene-index button>i{font-style:normal;margin-left:auto;color:var(--accent)}
+.scene-index button:hover,.scene-index button:focus-visible{color:var(--accent)}
+.chapter-sequence,#chapter-opening,#chapter-story,.chapter-interlude{scroll-margin-top:10px}
+.chapter-sequence .lc-wall .lc-stage,.chapter-sequence .lc-book .lc-stage{overflow:clip}
+.sequence-loading,.sequence-fallback{min-height:730px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:20px}
+.sequence-loading{font:12px var(--display);color:var(--muted);border-block:1px solid var(--line)}
+.sequence-fallback h2{font:400 clamp(42px,5vw,72px)/1 var(--display);max-width:800px}
+.sequence-fallback p:not(.eyebrow){font-size:13px;color:var(--muted)}
+.study-sequenced>.chapter-sequence{margin-block:25px 105px}
+.study-continuation .topic:last-child{margin-bottom:0}
+.study-return{color:var(--muted);padding-top:12px;align-self:start;position:sticky;top:170px}
+.study-return-mark{display:block;font:400 68px/1 var(--serif);color:var(--accent);margin-bottom:25px}
+.study-return>.eyebrow{font-size:9px;margin-bottom:18px}
+.study-return>p:not(.eyebrow){font-size:12px;line-height:1.8}
+.study-return>button{font:10px var(--display);border-bottom:1px solid var(--line);margin-top:22px;padding-block:8px;color:var(--text)}
+.study-return>button:hover{color:var(--accent)}
+@media(max-width:1100px){.scene-index{grid-template-columns:145px 1fr;gap:30px}.scene-index>div{gap:4px 18px}.scene-index button{font-size:10px}}
+@media(max-width:760px){.scene-index{display:block;padding-block:25px}.scene-index>.eyebrow{margin-bottom:20px}.scene-index>div{grid-template-columns:1fr 1fr;gap:5px 20px}.scene-index button{font-size:9px}.study-sequenced>.chapter-sequence{margin-block:0 55px}.study-return{display:none}.chapter-sequence,#chapter-opening,#chapter-story,.chapter-interlude{scroll-margin-top:0px}.sequence-loading,.sequence-fallback{min-height:650px}}

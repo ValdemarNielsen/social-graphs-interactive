@@ -68,3 +68,25 @@ These references inform original implementation; no demo assets or source code w
 The sculptures have different direct actions, live status text and pointer response. Reduced motion renders a fixed composition and applies the alternate composition immediately. Offscreen and hidden scenes suspend their continuing animation loop. Canvas rendering uses bounded pixel counts; the WebGL scenes additionally lower resolution adaptively. These measures are implementation choices, not a guarantee of equal performance across devices.
 
 The scroll stories also have chapter-specific three-dimensional entrances and layered framing; their final quantitative plane settles flat. Remounting a story when reduced motion changes prevents GSAP cleanup from restoring old animated SVG attributes over its static final geometry.
+
+
+## Motion throughout the chapter — third pass, 19 October 2026
+
+The latest feedback asked for varied, intricate motion below the openings and a steadier Spider-Man pull. This revision adds twelve full-width sequences, placed between the study-note halves and after the exercises. Each chapter now has six major scenes and a direct scene index. The original numerical teaching episodes remain available.
+
+Fresh primary references reviewed for this pass:
+
+- [Codrops: 3D folding technique](https://tympanus.net/codrops/2020/01/14/3d-folding-technique/) and [folding a cardboard box](https://tympanus.net/codrops/2022/12/13/how-to-code-an-on-scroll-folding-3d-cardboard-box-animation-with-three-js-and-gsap/) informed hinged paper and nested transform geometry. The comic triptych and concertina map are original CSS/SVG constructions.
+- [Codrops: kinetic typography transition](https://tympanus.net/codrops/2021/09/29/kinetic-typography-page-transition/) and [on-scroll sliced text](https://tympanus.net/codrops/2023/12/05/on-scroll-sliced-text-animation/) informed coordinated type, timing and section-to-section variety. Our letterpress uses actual tokenizer output; the sliced wall is explicitly decorative.
+- [Codrops: an infinite loom](https://tympanus.net/codrops/2026/09/05/building-an-infinite-loom-unravelling-images-into-threads-with-three-js/) informed the woven-material direction. The local loom uses original masked over/under SVG ribbons and a traveling shuttle, not copied images.
+- [Codrops: scroll-driven SVG maps](https://tympanus.net/codrops/2026/05/21/creating-scroll-driven-svg-map-animations-with-gsap/) informed path drawing and moving route markers. The nine-route illustration follows a disclosed synthetic topology and its shared bridge.
+- [Obys: a tactile web library](https://tympanus.net/codrops/2026/01/12/obys-design-books-turning-a-reading-list-into-a-tactile-web-library/) and [Codrops animated books](https://tympanus.net/Development/AnimatedBooks/) informed layered paper and book mechanics. The five-page document fan, scanner and feature strips are conceptual illustrations, not measured weights.
+- [Colorion: holographic card typography](https://text-effects.colorion.co/effects/holographic-card-text-effect/) informed the direction-changing surface. Our lenticular construction uses eighteen original two-sided CSS slats to change the context around “bank”.
+- [Codrops: 3D scroll-driven typography](https://tympanus.net/codrops/2025/11/04/creating-3d-scroll-driven-text-animations-with-css-and-gsap/) was read and its [cylinder demo](https://tympanus.net/Tutorials/3DTextScroll/) scrolled in the browser. It supported the emphasis on actual dimensional transformations. No cylinder effect or demo code was copied into this revision.
+- [Codrops: scroll-driven ghost trails](https://tympanus.net/codrops/2026/10/13/scroll-driven-ghost-trails/) provided a recent example of a page continuing through several different motion rhythms. It informed the chapter-wide sequencing, not a claim that this site implements that demo’s ghost renderer.
+
+The other new mechanisms are a flip-tile adjacency instrument, an enumeration of all eight three-trial outcomes, a degree-weighted ticket conveyor and a split-flap shortest-distance board. Their numerical claims are exact for the small examples stated alongside them. All assets and animation code are original, and no new dependencies were added.
+
+Spider-Man now makes one approach, pull, hold and release. The same eased playhead determines the character, letters and attached webs; the limp arc remains, but the underdamped letter springs and repeated character recoil are removed. Cached untransformed measurements also avoid temporarily clearing live transforms during resize. Replay, reverse scrolling, still mode and offscreen/hidden suspension remain supported.
+
+New sequences have finite replay and local state, with no extra pinned blank scrolling. Their layouts are lazy loaded behind independent visual error boundaries. A shared layout observer refreshes scroll ranges after asynchronous content changes height. Reduced motion keeps static views and explanatory controls; no study paragraph is hidden by the new animations.

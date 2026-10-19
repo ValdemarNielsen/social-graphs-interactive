@@ -77,3 +77,24 @@ This is a second visual pass responding to the opening scroll stutter and reques
 A 19-second production sample of the final week 4 liquid scene at 1440×900 recorded 779 animation-frame intervals: median 16.8 ms, p95 33.5 ms, 11 above 50 ms, CLS 0, LCP 1140 ms and 3 long tasks. This is one instrumented browser sample, not a promise of device-independent frame rate. No new physical-device or screen-reader audit was performed.
 
 All 13 calculation tests passed and the final TypeScript/production build passed. The main JavaScript bundle is 565.78 kB (192.96 kB gzip); new sculpture modules load separately. The existing bundler size advisory still applies. The numerical laboratories were not changed in this revision.
+
+
+## Chapter-wide motion revision — 19 October 2026
+
+The third pass retains all 48 topics and 65 exercise briefs, inserting twelve new sequences between study-note halves and after exercises. Static content extraction and scene-anchor mapping were independently reviewed.
+
+The home replay completed at progress 1.000 in hold mode with its loop stopped, after 5.819 seconds of its local clock. The middle letter retained a 53.18px limp sag. The implementation now has a deterministic pose rather than underdamped springs; source lifecycle checks covered reverse/revisit equivalence, one RAF owner, resize without transform reset, offscreen/hidden pause and cleanup.
+
+The new map, loom, press, sliced type, lenticular panel and document fan were reviewed at desktop size in the browser. Replay was exercised, and the map/loom/wall/book completed. Inspection found paper geometry crossing the controls; the map and book transformations were corrected, and the type-wall stage received a clipping boundary. A shared layout observer now refreshes scroll positions after lazy content changes document height.
+
+In the production build, the matrix contains 14 one-cells and six zero diagonal cells, and its replay ends in hold. The probability cascade has eight chips; their completed coordinates put them in groups of 1, 3, 3, 1. These checks complement the existing 13 passing mathematical tests. No numerical laboratory implementation changed.
+
+The production build passes TypeScript and bundling. Main JavaScript is 569.40 kB (193.77 kB gzip); the two new choreography modules load separately at 26.44 and 29.16 kB (9.05 and 9.69 kB gzip). No new dependency was introduced.
+
+A 13.4-second instrumented production sample spanning the week 1 cover and a jump to the matrix, at 1280×720, recorded 599 frame intervals: median 16.7 ms, p95 33.2 ms, 9 above 50 ms, CLS 0.0034, LCP 728 ms and 6 long tasks. This is a mixed navigation sample, not an isolated-animation benchmark or frame-rate guarantee. Some browser inspection tabs stalled during repeated development navigation and were replaced; final checks use the stable production preview.
+
+Final production-preview checks confirmed the A, A, A, B, C, D conveyor tickets, the distance board's 0, 1, 1, 2, 3, infinity values and completed replay, and the nine route ribbons through the shared bridge. Route replay and motion reduction were exercised. Both network sequences switched to complete static artwork with no running replay.
+
+The corrected map's folded panels fit inside its 430 px stage. The book fan's five final pages also fit within that height, and selecting its first and final still views worked. There was no horizontal overflow on the tested week 6 page. The compact comic now measures 794 px overall, with a 455 px artwork area, at 1440×900.
+
+In the production home page, scrolling forward reached progress 0.999 toward 1.000; reversing to the top restored progress 0.000 and stopped the animation loop. The final production inspection tab reported no console warnings or errors. This revision does not claim a physical-device or screen-reader audit.

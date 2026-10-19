@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState } from 'react';
 import './hero-experience.css';
 
 type Point = { x: number; y: number };
-type Particle = Point & { rotation: number; vx: number; vy: number; vr: number };
 const WORD = 'connected.';
 const clamp = (value: number, low = 0, high = 1) => Math.max(low, Math.min(high, value));
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -95,26 +94,27 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
     let replayElapsed = 0, replayClock: number | null = null, replayFrom = 0, replayLeadIn = 0;
     const replayDuration = 5800;
     // A 50 ms time constant closes 96% of a scroll gap in 160 ms. Only this
-    // RAF owns the playhead, articulated pose, springs, and attached SVG webs.
+    // RAF owns the playhead, articulated pose, and attached SVG webs. This
+    // first-order response approaches its target without velocity or overshoot.
     const scrubTimeConstant = .05;
     let width = 1, height = 1;
+    let scrollStart = 0, scrollRange = 1;
     let actorBox = { x: 0, y: 0, width: 1, height: 1 };
     let letterBoxes: { x: number; y: number; width: number; height: number }[] = [];
-    const particles: Particle[] = Array.from(WORD, () => ({ x: 0, y: 0, rotation: 0, vx: 0, vy: 0, vr: 0 }));
-    const pose = { x: 54, y: -32, rotation: 15 };
+    const pose = { x: 40, y: -24, rotation: 6 };
     const reachingArm = figure.querySelector('.hx-reaching-arm');
     const maskJoint = figure.querySelector('.hx-mask-joint');
-    const target = { x: 54, y: -32, rotation: 15, shoot: 0, tension: 0, hang: 0 };
+    const target = { x: 40, y: -24, rotation: 6, shoot: 0, tension: 0, hang: 0 };
+    // One approach, one pull, one controlled release. No recoil keyframes:
+    // a fixed progress always yields exactly the same actor and letter pose.
     const beats = [
-      [0, 54, -32, 15, 0, 0, 0],
-      [.17, -64, 38, -19, 0, 0, 0],
-      [.27, 0, 0, -6, 0, 0, 0],
-      [.34, 6, -6, -8, 1, 0, 0],
-      [.50, 65, -78, -20, 1, 1, 0],
-      [.57, 74, -86, -22, 1, 1, 0],
-      [.67, -24, 24, 7, 1, 0, 1],
-      [.79, 14, -11, -7, 1, 0, 1],
-      [1, 0, 0, -3, 1, 0, 1],
+      [0, 40, -24, 6, 0, 0, 0],
+      [.24, 0, 0, -4, 0, 0, 0],
+      [.36, 0, 0, -4, 1, 0, 0],
+      [.55, 48, -54, -12, 1, 1, 0],
+      [.63, 48, -54, -12, 1, 1, 0],
+      [.88, 12, -6, -4, 1, 0, 1],
+      [1, 12, -6, -4, 1, 0, 1],
     ];
     const pointOnActor = (x: number, y: number): Point => {
       const originX = actorBox.width * .5, originY = actorBox.height * .25;
@@ -137,13 +137,10 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
       target.shoot = mix(a[4], b[4], eased);
       target.tension = mix(a[5], b[5], eased);
       target.hang = mix(a[6], b[6], eased);
-      if (phase.current) phase.current.textContent = progress < .28 ? '01 / Follow the thread' : progress < .6 ? '02 / One connection changes everything' : '03 / Nothing moves alone';
+      if (phase.current) phase.current.textContent = progress < .28 ? '01 / Follow the thread' : progress < .63 ? '02 / One connection changes everything' : '03 / Nothing moves alone';
     }
-    function draw(dt: number, snap = false) {
+    function draw() {
       const scale = width < 650 ? .56 : 1;
-      const substeps = Math.max(1, Math.ceil(dt * 120));
-      const stepDt = dt / substeps;
-      let energy = 0;
       // The playhead is already eased. A second actor-only filter would make
       // its shoulder and hand trail the web-shooting beat by a different amount.
       for (const key of ['x', 'y', 'rotation'] as const) pose[key] = target[key];
@@ -151,26 +148,16 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
       reachingArm?.setAttribute('transform', `rotate(${target.tension * 18} 185 185)`);
       maskJoint?.setAttribute('transform', `rotate(${-target.tension * 9} 230 145)`);
       const anchors: Point[] = [];
-      particles.forEach((particle, i) => {
+      Array.from(WORD).forEach((_, i) => {
         const influence = Math.pow((i + 1) / WORD.length, 1.8);
         const arc = Math.sin(i / (WORD.length - 1) * Math.PI);
         const tx = (54 * influence * target.tension - (i - 4) * .8 * target.hang) * scale;
         const direction = width < 650 ? 1 : -1;
         const ty = (direction * 118 * influence * target.tension + arc * 54 * target.hang) * scale;
         const tr = direction * 19 * influence * target.tension + Math.cos(i / (WORD.length - 1) * Math.PI) * 13 * target.hang;
-        if (snap) { particle.x = tx; particle.y = ty; particle.rotation = tr; particle.vx = particle.vy = particle.vr = 0; }
-        else {
-          const stiffness = 92 - i * 2.5;
-          // Integrate real elapsed time in stable substeps. Clamping every sparse
-          // browser frame to 32ms would make the spring lag behind the playhead.
-          for (let step = 0; step < substeps; step++) {
-            particle.vx = (particle.vx + (tx - particle.x) * stiffness * stepDt) * Math.exp(-8 * stepDt);
-            particle.vy = (particle.vy + (ty - particle.y) * stiffness * stepDt) * Math.exp(-7.1 * stepDt);
-            particle.vr = (particle.vr + (tr - particle.rotation) * 65 * stepDt) * Math.exp(-7.8 * stepDt);
-            particle.x += particle.vx * stepDt; particle.y += particle.vy * stepDt; particle.rotation += particle.vr * stepDt;
-          }
-        }
-        energy += Math.abs(tx - particle.x) + Math.abs(ty - particle.y) + Math.abs(tr - particle.rotation) + Math.abs(particle.vx) + Math.abs(particle.vy) + Math.abs(particle.vr);
+        // Sag is part of the pose, not a spring simulation. The letters retain
+        // their limp arc while stopping and reversing with the character.
+        const particle = { x: tx, y: ty, rotation: tr };
         const element = letters.current[i];
         if (element) element.style.transform = `translate3d(${particle.x}px,${particle.y}px,0) rotate(${particle.rotation}deg)`;
         const box = letterBoxes[i];
@@ -194,11 +181,10 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
         chain.current?.setAttribute('d', anchors.map((anchor, i) => i ? `Q ${(anchors[i - 1].x + anchor.x) / 2} ${(anchors[i - 1].y + anchor.y) / 2 + 10 * target.hang} ${anchor.x} ${anchor.y}` : `M ${anchor.x} ${anchor.y}`).join(' '));
         chain.current?.setAttribute('opacity', String(target.shoot * .72));
         burst.current?.setAttribute('transform', `translate(${contact.x} ${contact.y})`);
-        burst.current?.setAttribute('opacity', String(reduced ? 0 : Math.max(0, 1 - Math.abs(progress - .345) / .035)));
+        burst.current?.setAttribute('opacity', String(reduced ? 0 : Math.max(0, 1 - Math.abs(progress - .36) / .025)));
       }
       section!.style.setProperty('--hx-pull', String(target.tension));
       section!.dataset.heroFrame = String(++drawnFrames);
-      return energy;
     }
     function advanceReplayClock(now: number) {
       if (mode === 'replay' && replayClock !== null) replayElapsed += Math.max(0, now - replayClock);
@@ -212,9 +198,7 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
       lastTime = now;
       if (needsMeasure) measure();
       if (scrollDirty && !reduced) {
-        const bounds = section!.getBoundingClientRect();
-        const stickyOffset = Number.parseFloat(getComputedStyle(viewport!).top) || 0;
-        const next = clamp((stickyOffset - bounds.top) / Math.max(1, section!.offsetHeight - viewport!.offsetHeight));
+        const next = clamp((window.scrollY - scrollStart) / scrollRange);
         const userMoved = scrollInput && Math.abs(next - lastScrollProgress) > .00001;
         lastScrollProgress = next;
         if (userMoved) { mode = 'scroll'; replayClock = null; }
@@ -237,11 +221,11 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
         if (Math.abs(requestedProgress - progress) < .0001) progress = requestedProgress;
       }
       updateTarget(progress);
-      const energy = draw(Math.min(1, elapsed), reduced || drawnFrames === 0);
+      draw();
       section!.dataset.heroTarget = requestedProgress.toFixed(3);
       section!.dataset.heroMode = mode;
       section!.dataset.heroReplayTime = (replayElapsed / 1000).toFixed(3);
-      if (!reduced && (energy > .14 || mode === 'replay' || progress !== requestedProgress)) wake();
+      if (!reduced && (mode === 'replay' || progress !== requestedProgress)) wake();
       else { lastTime = null; section!.dataset.heroRunning = 'false'; }
     }
     function wake() {
@@ -263,14 +247,22 @@ export default function HeroExperience({ reduced }: { reduced: boolean }) {
       needsMeasure = false;
       const bounds = viewport!.getBoundingClientRect();
       width = bounds.width; height = bounds.height;
-      figure!.style.transform = 'none';
-      letters.current.forEach(element => { if (element) element.style.transform = 'none'; });
-      const figureBounds = figure!.getBoundingClientRect();
-      actorBox = { x: figureBounds.left - bounds.left, y: figureBounds.top - bounds.top, width: figureBounds.width, height: figureBounds.height };
-      letterBoxes = letters.current.map(element => {
-        const rect = element!.getBoundingClientRect();
-        return { x: rect.left - bounds.left, y: rect.top - bounds.top, width: rect.width, height: rect.height };
-      });
+      // Layout offsets exclude transforms. Never clear live transforms to
+      // measure: that would force an unnecessary layout reset during motion.
+      const layoutBox = (element: HTMLElement) => {
+        let x = 0, y = 0, parent: HTMLElement | null = element;
+        while (parent && parent !== viewport) {
+          x += parent.offsetLeft; y += parent.offsetTop;
+          parent = parent.offsetParent as HTMLElement | null;
+        }
+        const style = getComputedStyle(element);
+        return { x, y, width: Number.parseFloat(style.width) || element.offsetWidth, height: Number.parseFloat(style.height) || element.offsetHeight };
+      };
+      actorBox = layoutBox(figure!);
+      letterBoxes = letters.current.map(element => layoutBox(element!));
+      const stickyOffset = Number.parseFloat(getComputedStyle(viewport!).top) || 0;
+      scrollStart = section!.getBoundingClientRect().top + window.scrollY - stickyOffset;
+      scrollRange = Math.max(1, section!.offsetHeight - viewport!.offsetHeight);
       threads.current?.setAttribute('viewBox', `0 0 ${width} ${height}`);
     }
     function scroll() {

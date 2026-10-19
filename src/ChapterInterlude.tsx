@@ -407,10 +407,10 @@ export default function ChapterInterlude({ week, reduced, variant }: ChapterInte
   }, [week, variant, reduced]);
   if (!episode) return null;
   const { Component } = episode;
-  return <section ref={ref} className={`chapter-interlude ci-week-${week} ci-${index === 0 ? 'before' : 'after'}`} data-ci-reduced={reduced} aria-labelledby={titleId}>
+  return <section id={`episode-${variant}`} ref={ref} className={`chapter-interlude ci-week-${week} ci-${index === 0 ? 'before' : 'after'}`} data-ci-reduced={reduced} aria-labelledby={titleId}>
     <div className="ci-inner">
       <header className="ci-header"><div className="ci-folio" aria-hidden="true">0{week}<span>{index === 0 ? 'A' : 'B'}</span></div><div><p className="ci-kicker">{episode.kicker}</p><h2 id={titleId}>{episode.title}</h2><p className="ci-intro">{episode.body}</p></div></header>
-      <div className="ci-stage"><Component key={`${week}-${variant}`} reduced={reduced} /></div>
+      <div className="ci-stage"><Component key={`${week}-${variant}-${reduced}`} reduced={reduced} /></div>
     </div>
   </section>;
 }

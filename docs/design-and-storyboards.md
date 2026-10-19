@@ -123,7 +123,7 @@ Both coordinate axes and their values are exact for this count space. It is not 
 
 ## Motion ownership and escape routes
 
-GSAP/ScrollTrigger owns the main chapter SVG narratives, caption changes and scene progress. The home hero has its own spring renderer, while its GSAP tween controls only a numerical playhead. Cover Canvas renderers, the WebGL sculpture and interactive episodes own their separate surfaces. React owns content and experiment state. Cleanup reverts scoped GSAP contexts, cancels frames and disconnects observers when components leave the page.
+GSAP/ScrollTrigger owns the main chapter SVG narratives, caption changes and scene progress. The home hero has one requestAnimationFrame owner for an eased playhead, articulated pose, sagging letters and attached webs. All geometry derives deterministically from that playhead, so reverse scrolling revisits the same pose without spring recoil. Cover Canvas renderers, the WebGL sculpture and interactive episodes own their separate surfaces. React owns content and experiment state. Cleanup reverts scoped GSAP contexts, cancels frames and disconnects observers when components leave the page.
 
 The long scenes use native page scrolling and sticky composition rather than scroll hijacking. Scroll-linked states respond in both directions. Header navigation and chapter links remain accessible, and direct jumps can bypass the visual sequence.
 
@@ -134,3 +134,12 @@ When system reduced motion or the manual reduction control is active, cover art 
 Mobile layouts stack the question and graphic, then controls and results. Chapter miniatures are removed from the overview where they would compete with titles. Study navigation becomes a compact grid. Data regions can scroll horizontally without making the page itself overflow. Typography, spacing, hit targets and sticky offsets have responsive rules.
 
 This document records design decisions, source-code behavior and the observed three-direction prototype review. It does not certify a frame rate, all mobile devices, screen-reader conformance or the completion of final browser tests. Those checks and measured limitations belong in the separate delivery QA report.
+
+
+## Motion throughout the chapter — third pass
+
+A chapter now has six major scenes, with four appearing below the laboratory: the two existing teaching episodes plus two new full-width sequences. The middle sequence sits between the two halves of the study notes. The closing sequence follows every exercise brief and precedes the self-check. Topic identifiers, ordering, formulas, examples, reasoning disclosures and pitfalls are retained. A scene index after the cover offers direct jumps to all six scenes.
+
+The added scenes use distinct mechanisms rather than recoloring the same particle composition: hinged comic panels and a rotating matrix for representation; branching probability and a ticket conveyor for models; a departure board and flowing route ribbons for paths; nested folds and an over/under loom for communities; a paper-feed press and sliced typography for tokens; turning lenticular panels and a fanned document scanner for meaning. These are original illustrations with their explanatory limits visible alongside them.
+
+Each sequence owns only its local transforms. It can replay independently of page scrolling, settles when not active, and offers static phase controls when motion is reduced. New sequences do not add pinned blank scroll sections.
