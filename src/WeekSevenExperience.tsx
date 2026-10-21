@@ -7,16 +7,16 @@ import ExperimentBoundary from './ExperimentBoundary';
 import './week-seven.css';
 
 const cases = [
-  { id: 'week7-sentiment-audit', anchor: 'w7-sentiment', title: 'Audit the feeling', number: '01' },
-  { id: 'week7-entity-resolution', anchor: 'w7-entities', title: 'Follow the name', number: '02' },
-  { id: 'week7-evidence-retrieval', anchor: 'w7-retrieval', title: 'Find the evidence', number: '03' },
+  { id: 'week7-sentiment-audit', anchor: 'w7-sentiment', title: 'The sentiment sorter', number: '01' },
+  { id: 'week7-entity-resolution', anchor: 'w7-entities', title: 'Repair the network', number: '02' },
+  { id: 'week7-evidence-retrieval', anchor: 'w7-retrieval', title: 'Wire the evidence', number: '03' },
 ];
 function jump(id: string, reduced: boolean) {
   document.getElementById(id)?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'start' });
 }
 function readRecord(): string[] {
   try {
-    const saved: unknown = JSON.parse(localStorage.getItem('sg-week7-evidence') ?? '[]');
+    const saved: unknown = JSON.parse(localStorage.getItem('sg-week7-minigames') ?? '[]');
     return Array.isArray(saved) ? cases.filter(c => saved.includes(c.id)).map(c => c.id) : [];
   } catch { return []; }
 }
@@ -54,22 +54,22 @@ export default function WeekSevenExperience({ week, reduced }: { week: Week; red
     if (!cases.some(c => c.id === id)) return;
     setSolved(previous => {
       const next = previous.includes(id) ? previous : [...previous, id];
-      try { localStorage.setItem('sg-week7-evidence', JSON.stringify(next)); } catch { /* The case remains playable without storage. */ }
+      try { localStorage.setItem('sg-week7-minigames', JSON.stringify(next)); } catch { /* The game remains playable without storage. */ }
       return next;
     });
   }, []);
   const section = (ids: string[]) => ids.flatMap(id => week.sections.filter(note => note.id === id));
   return <div className="w7-experience" data-reduced={reduced}>
     <div id="chapter-opening"><WeekSevenCover reduced={reduced}/></div>
-    <nav className="w7-itinerary wrap" aria-label="Week 7 investigations">
-      <div><span className="w7-kicker">Your casebook</span><p>{solved.length} of 3 cases solved</p><small>Saved in this browser</small></div>
+    <nav className="w7-itinerary wrap" aria-label="Week 7 minigames">
+      <div><span className="w7-kicker">Your casebook</span><p>{solved.length} of 3 games solved</p><small>Saved in this browser</small></div>
       <button onClick={() => jump('w7-atlas', reduced)}><span>Start here</span>The document atlas<i aria-hidden="true">↘</i></button>
-      {cases.map(c => <button key={c.id} onClick={() => jump(c.anchor, reduced)}><span>{solved.includes(c.id) ? '✓ Solved' : `Case ${c.number}`}</span>{c.title}<i aria-hidden="true">↘</i></button>)}
+      {cases.map(c => <button key={c.id} onClick={() => jump(c.anchor, reduced)}><span>{solved.includes(c.id) ? '✓ Solved' : `Play ${c.number}`}</span>{c.title}<i aria-hidden="true">↘</i></button>)}
     </nav>
     <section className="w7-introduction wrap" id="study">
       <p className="w7-kicker">The brief / Week 07</p>
       <h2>A model gives you an answer.<br/><em>You decide what it proves.</em></h2>
-      <div><p>Last week, words became vectors. This week, those vectors become instruments: maps, labels, entities, and search results. Every instrument makes choices. Your job is to make those choices visible.</p><p>Try the three cases in any order. Read the notes beside the experiments, then take the methods to the original course exercises. All case texts and model outputs here are small, authored teaching examples.</p></div>
+      <div><p>Last week, words became vectors. This week, those vectors become instruments: maps, labels, entities, and search results. Every instrument makes choices. Your job is to make those choices visible.</p><p>Sort a sentence. Repair a network. Wire an answer to its evidence. Play the three games in any order, at your own pace; the machinery responds to your moves. Read the notes between games, then try the original course exercises. All game texts and model outputs are small, authored teaching examples.</p></div>
     </section>
     <div id="w7-atlas" className="w7-anchor"><ExperimentBoundary><MeasurementAtlas reduced={reduced}/></ExperimentBoundary></div>
     <ReadingDesk number="01" title="Before a vector becomes a claim." notes={section(['contextual-meaning', 'document-embeddings', 'corpus-atlas', 'semantic-groups'])}/>
@@ -82,7 +82,7 @@ export default function WeekSevenExperience({ week, reduced }: { week: Week; red
     <ReadingDesk number="04" title="Make the answer traceable." notes={section(['semantic-search', 'rag'])}/>
     <section className="w7-closing wrap" aria-label="Investigation record">
       <div className="w7-closing-heading"><p className="w7-kicker">The evidence you keep</p><h2>Three habits.<br/><em>Better questions.</em></h2><p>The useful reward is knowing where to look when a result seems too convincing.</p></div>
-      <div className="w7-receipt"><p className="w7-page-running"><span>Investigation record</span><span>07 / 2026</span></p>{cases.map((c, i) => <div className="w7-receipt-line" key={c.id}><span>{c.number}</span><p>{['Test a label against the actual sentence.', 'Resolve a name before making an edge.', 'Check a claim against its retrieved source.'][i]}</p><strong>{solved.includes(c.id) ? 'VERIFIED' : 'TO CHECK'}</strong></div>)}<p className="w7-receipt-foot" role="status">{solved.length === 3 ? 'All three cases solved. Now test these habits on real course data.' : `${solved.length} of 3 cases solved. The experiments remain open for another attempt.`}</p></div>
+      <div className="w7-receipt"><p className="w7-page-running"><span>Game record</span><span>07 / 2026</span></p>{cases.map((c, i) => <div className="w7-receipt-line" key={c.id}><span>{c.number}</span><p>{['Test a label against the actual sentence.', 'Resolve a name before making an edge.', 'Check a claim against its retrieved source.'][i]}</p><strong>{solved.includes(c.id) ? 'VERIFIED' : 'TO PLAY'}</strong></div>)}<p className="w7-receipt-foot" role="status">{solved.length === 3 ? 'All three games solved. Now test these habits on real course data.' : `${solved.length} of 3 games solved. Every game can be replayed.`}</p></div>
     </section>
     <ReadingDesk number="05" title="The choices before the chart." notes={section(['bias-and-project'])}/>
     <section className="w7-objectives wrap"><p className="w7-kicker">Take these tools with you</p><div>{week.objectives.map((objective, i) => <p key={objective}><span>{String(i + 1).padStart(2, '0')}</span>{objective}</p>)}</div><button onClick={() => jump('practice', reduced)}>Open the 13 course exercises <span aria-hidden="true">↓</span></button></section>

@@ -113,7 +113,7 @@ export default function WeekSevenCover({ reduced }: MotionProps) {
     <div className="w7i-cover-copy"><p className="w7i-kicker">Week 07 <span/> From meaning to measurement</p>
       <h1 id="w7i-opening-title">Don’t take<br/> a model<br/><em>at its word.</em></h1>
       <p className="w7i-cover-deck">Turn language into measurements.<br/>Then ask what those measurements miss.</p>
-      <button type="button" className="w7i-enter" onClick={() => document.getElementById('w7-sentiment')?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'start' })}>Open the case files <span aria-hidden="true">↘</span></button>
+      <button type="button" className="w7i-enter" onClick={() => document.getElementById('w7-sentiment')?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'start' })}>Play the minigames <span aria-hidden="true">↘</span></button>
       <p className="w7i-edition">THE EVIDENCE ROOM <span>NO. 007</span></p>
     </div>
     <div className="w7i-cover-instrument">

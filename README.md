@@ -2,7 +2,9 @@
 
 A standalone React, TypeScript and Vite learning companion to [Sune Lehmann’s 2026 Social Graphs and Interactions course, DTU 02805](https://sunelehmann.com/socialgraphs2026-web/index.html#weeks). Seven chapter pages combine mathematical experiments, study notes and exercise briefs. Weeks 1–6 have individual covers, stories and twenty-four visual episodes. **Week 7 is the evidence room:** an illustrated inspection press, a document atlas, a grouping-method comparison and three playable investigations.
 
-Week 7 has its own paper-and-ink composition rather than repeating the previous chapter template. Audit six sentiment judgments, resolve three ambiguous identity pairs and assemble a two-source evidence chain. Calculations use explicit synthetic examples; illustrative annotations and semantic rankings are identified as authored, not live pretrained-model outputs. The casebook saves solved cases locally. Eleven reading notes and all thirteen original exercise identifiers remain available alongside the investigations.
+Week 7 has its own paper-and-ink composition and three animated mini-games. Route sentence slips through a sentiment sorter, cut false identity wires and reconnect an alias, then build an evidence circuit that powers three supported claims. Your moves drive the artwork: papers travel or rebound, cables trace identity checks, and evidence packets pass or fail claim gates. There is no countdown or scroll-dependent move. Each game supports replay, keyboard controls and reduced motion.
+
+Calculations use explicit synthetic examples; illustrative annotations and semantic rankings are identified as authored, not live pretrained-model outputs. The casebook saves solved games locally under a separate key from the original investigation record. Eleven reading notes and all thirteen original exercise identifiers remain available alongside the games.
 
 The home scene uses an original SVG Spider-Man drawing to pull connected typography, with one smoothed, reversible pull-and-release playhead. Its hanging letters derive from the same pose, avoiding independent spring wobble. The chapter openings now include a woven three-dimensional filament knot, an exploding chrome mechanism, a bending transit tunnel, merging iridescent liquid forms, particle typography, and the original week 6 glass sculpture. Canvas scenes use perspective projection; the chrome, liquid and glass use custom WebGL raymarching. These are illustrative compositions with approximate optical effects, not measured networks or physically validated optical simulations.
 
@@ -91,7 +93,10 @@ src/content-week7.ts         Week 7 learning content and all thirteen exercise b
 src/WeekSevenExperience.tsx  Evidence room, reading desks and local casebook
 src/WeekSevenCover.tsx       Illustrated inspection press and exact toy projection atlas
 src/WeekSevenMethods.tsx     Three different grouping outputs, explicitly illustrative
-src/WeekSevenCases.tsx       Sentiment, identity resolution and grounded retrieval cases
+src/WeekSevenCases.tsx       Exports the three independent mini-game modules
+src/WeekSevenSentimentGame.tsx Sentence sorting press, rebound and round progression
+src/WeekSevenEntityGame.tsx  Identity wire repair and reconstructed network counts
+src/WeekSevenRetrievalGame.tsx Source-to-claim wiring and evidence transmission
 src/weekSevenMath.ts         Transparent case calculations and authored example data
 src/HeroExperience.tsx       Original Spider-Man SVG and connected-type interaction
 src/ChapterCover.tsx         Six chapter-specific cover compositions
