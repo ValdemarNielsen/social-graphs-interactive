@@ -1,6 +1,8 @@
 # Social Graphs — an interactive field guide
 
-A standalone React, TypeScript and Vite learning companion to [Sune Lehmann’s 2026 Social Graphs and Interactions course, DTU 02805](https://sunelehmann.com/socialgraphs2026-web/index.html#weeks). Six independent chapter pages combine live mathematical experiments, study notes and exercise briefs with **six distinct chapter covers, six animated stories and twenty-four interactive visual episodes**.
+A standalone React, TypeScript and Vite learning companion to [Sune Lehmann’s 2026 Social Graphs and Interactions course, DTU 02805](https://sunelehmann.com/socialgraphs2026-web/index.html#weeks). Seven chapter pages combine mathematical experiments, study notes and exercise briefs. Weeks 1–6 have individual covers, stories and twenty-four visual episodes. **Week 7 is the evidence room:** an illustrated inspection press, a document atlas, a grouping-method comparison and three playable investigations.
+
+Week 7 has its own paper-and-ink composition rather than repeating the previous chapter template. Audit six sentiment judgments, resolve three ambiguous identity pairs and assemble a two-source evidence chain. Calculations use explicit synthetic examples; illustrative annotations and semantic rankings are identified as authored, not live pretrained-model outputs. The casebook saves solved cases locally. Eleven reading notes and all thirteen original exercise identifiers remain available alongside the investigations.
 
 The home scene uses an original SVG Spider-Man drawing to pull connected typography, with one smoothed, reversible pull-and-release playhead. Its hanging letters derive from the same pose, avoiding independent spring wobble. The chapter openings now include a woven three-dimensional filament knot, an exploding chrome mechanism, a bending transit tunnel, merging iridescent liquid forms, particle typography, and the original week 6 glass sculpture. Canvas scenes use perspective projection; the chrome, liquid and glass use custom WebGL raymarching. These are illustrative compositions with approximate optical effects, not measured networks or physically validated optical simulations.
 
@@ -33,7 +35,7 @@ The preview normally runs at `http://127.0.0.1:4173`. Serve `dist/` through an H
 
 ## Course coverage
 
-The index was checked on **19 October 2026**. All six linked weekly teaching pages were read. The companion contains **48 explanation sections and 65 numbered exercise briefs**, preserving source exercise identifiers and linking back to complete instructions.
+Weeks 1–6 were reviewed on **19 October 2026**. The index and newly published Week 7 were checked on **21 October 2026**. The companion contains **59 explanation sections and 78 numbered exercise briefs**, preserving source exercise identifiers and linking back to complete instructions.
 
 | Week | Coverage | Live experiment |
 |---|---|---|
@@ -43,13 +45,15 @@ The index was checked on **19 October 2026**. All six linked weekly teaching pag
 | 4 | Communities, modularity, Louvain, overlap, weights and backbones | Edit community membership and calculate modularity |
 | 5 | Tokens, preprocessing, frequencies, Zipf, context and Bag of Words | Edit text, inspect tokens and exact rank-frequency counts |
 | 6 | TF-IDF, cosine, term contrasts, LDA, PPMI and static embeddings | Edit documents plus a word-context matrix; inspect TF-IDF, cosine and PPMI |
+| 7 | Contextual/document embeddings, projection, grouping, sentiment validation, entities, retrieval/RAG and upstream bias | Audit labels, resolve identities, retrieve evidence and compare exact distances in a toy atlas |
 
-Weeks 7 and 8 are listed but do not have available weekly pages in the discovered index. Weeks 9–13 are the project period without separate weekly teaching-page links. Future material has not been invented or substituted from a different course year.
+Week 8 is marked coming in the index on 21 October 2026. Weeks 9–13 are the project period without separate weekly teaching-page links. Future material has not been invented or substituted from a different course year.
 
 The research inventories record detailed coverage and access limits:
 
 - [Weeks 1–3 inventory](docs/inventory-weeks-1-3.md)
 - [Weeks 4–6 inventory](docs/inventory-weeks-4-6.md)
+- [Week 7 inventory](docs/inventory-week-7.md)
 - [Design studies and chapter storyboards](docs/design-and-storyboards.md)
 - [Motion references and implementation notes](docs/motion-references.md), including links to the primary references and official implementation documentation
 - [QA report](docs/qa-report.md), separating observed checks from limitations
@@ -58,7 +62,7 @@ The experiments deliberately use labeled synthetic data. The [frozen course data
 
 ## Navigation, accessibility and local state
 
-Routes use hashes: `#/`, `#/week/1`, …, `#/week/6`. A direct chapter link such as `https://valdemarnielsen.github.io/social-graphs-interactive/#/week/6` loads the same static entry document, so refreshing a chapter does not require server rewrite rules. Unknown chapter routes display a return path to the overview.
+Routes use hashes: `#/`, `#/week/1`, …, `#/week/7`. A direct chapter link such as `https://valdemarnielsen.github.io/social-graphs-interactive/#/week/7` loads the same static entry document, so refreshing a chapter does not require server rewrite rules. Unknown chapter routes display a return path to the overview.
 
 Vite’s `base: './'` makes built assets relative to the repository’s Pages path. Navigation, the study-topic list, section jumps and browser back/forward remain separate from the scroll illustrations. The six-node graph-to-matrix story preserves exact relationships. The twelve original teaching episodes calculate the values they display, including degree counts, seeded networks, paths, modularity, token frequencies and TF-IDF. Illustrative placement and decorative scenes are identified where used; the laboratories support more detailed numerical exploration.
 
@@ -83,6 +87,12 @@ Workflow versions were checked against the official GitHub release endpoints on 
 src/App.tsx                  Page shell, routes, navigation and local progress
 src/content-networks.ts      Weeks 1–3 learning content
 src/content-language.ts      Weeks 4–6 learning content
+src/content-week7.ts         Week 7 learning content and all thirteen exercise briefs
+src/WeekSevenExperience.tsx  Evidence room, reading desks and local casebook
+src/WeekSevenCover.tsx       Illustrated inspection press and exact toy projection atlas
+src/WeekSevenMethods.tsx     Three different grouping outputs, explicitly illustrative
+src/WeekSevenCases.tsx       Sentiment, identity resolution and grounded retrieval cases
+src/weekSevenMath.ts         Transparent case calculations and authored example data
 src/HeroExperience.tsx       Original Spider-Man SVG and connected-type interaction
 src/ChapterCover.tsx         Six chapter-specific cover compositions
 src/GlassSculpture.tsx       Custom WebGL raymarching sculpture and fallback
